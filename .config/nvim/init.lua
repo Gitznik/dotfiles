@@ -1,27 +1,6 @@
---[[
-Kickstart Guide:
+require("sets")
+require("remaps")
 
-I have left several `:help X` comments throughout the init.lua
-You should run that command and read that help section for more information.
-
-
-In addition, I have some `NOTE:` items throughout the file.
-These are for you, the reader to help understand what is happening. Feel free to delete
-them once you know what you're doing, but they should serve as a guide for when you
-are first encountering a few different constructs in your nvim config.
-
---]]
--- Disable netrw for nvim-tree
-vim.g.loaded_netrw = 1
-vim.g.loaded_netrwPlugin = 1
--- Set <space> as the leader key
--- See `:help mapleader`
---  NOTE: Must happen before plugins are required (otherwise wrong leader will be used)
-vim.g.mapleader = ' '
-vim.g.maplocalleader = ' '
-
-vim.wo.wrap = false
-vim.wo.cursorline = true
 -- Install package manager
 --    https://github.com/folke/lazy.nvim
 --    `:help lazy.nvim.txt` for more info
@@ -187,57 +166,6 @@ require('lazy').setup({
   { import = 'custom.plugins' },
 }, {})
 
--- [[ Setting options ]]
--- See `:help vim.o`
--- NOTE: You can change these options as you wish!
-
--- Set highlight on search
-vim.o.hlsearch = false
-
--- Make line numbers default
-vim.wo.relativenumber = true
-
--- Enable mouse mode
-vim.o.mouse = 'a'
-
--- Sync clipboard between OS and Neovim.
---  Remove this option if you want your OS clipboard to remain independent.
---  See `:help 'clipboard'`
-vim.o.clipboard = 'unnamedplus'
-
--- Enable break indent
-vim.o.breakindent = true
-
--- Save undo history
-vim.o.undofile = true
-
--- Case-insensitive searching UNLESS \C or capital in search
-vim.o.ignorecase = true
-vim.o.smartcase = true
-
--- Keep signcolumn on by default
-vim.wo.signcolumn = 'yes'
-
--- Decrease update time
-vim.o.updatetime = 250
-vim.o.timeoutlen = 300
-
--- Set completeopt to have a better completion experience
-vim.o.completeopt = 'menuone,noselect'
-
--- NOTE: You should make sure your terminal supports this
-vim.o.termguicolors = true
-
--- [[ Basic Keymaps ]]
-
--- Keymaps for better default experience
--- See `:help vim.keymap.set()`
-vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
-
--- Remap for dealing with word wrap
-vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
-vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
-
 -- [[ Highlight on yank ]]
 -- See `:help vim.highlight.on_yank()`
 local highlight_group = vim.api.nvim_create_augroup('YankHighlight', { clear = true })
@@ -248,56 +176,6 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   group = highlight_group,
   pattern = '*',
 })
-
--- [[ Configure Nvim-Tree ]]
-require("nvim-tree").setup({
-  filters = {
-    git_ignored = false,
-  },
-})
-vim.keymap.set('n', '<Leader>e', "<cmd>NvimTreeFindFile<cr>", { desc = "Toggle NvimTree" })
-
--- [[ Configure LazyGit ]]
-vim.keymap.set('n', '<Leader>gg', require('lazygit').lazygit, { desc = 'Toggle LazyGit' })
-
--- [[ Configure Harpoon ]]
-local mark = require("harpoon.mark")
-local ui = require("harpoon.ui")
-
-vim.keymap.set("n", "<leader>ha", mark.add_file, { desc = '[h]arpoon [a]dd mark' })
-vim.keymap.set("n", "<C-e>", ui.toggle_quick_menu)
-
--- TODO: Come up with good keybinds for harpoon
--- vim.keymap.set("n", "<C-j>", function() ui.nav_file(1) end)
--- vim.keymap.set("n", "<C-k>", function() ui.nav_file(2) end)
--- vim.keymap.set("n", "<C-l>", function() ui.nav_file(3) end)
--- vim.keymap.set("n", "<C-'>", function() ui.nav_file(4) end)
-
--- [[ Configure Refactor ]]
-vim.keymap.set("x", "<leader>re", ":Refactor extract ", { desc = '[r]efactor [e]xtract' })
-vim.keymap.set("x", "<leader>rf", ":Refactor extract_to_file ", { desc = '[r]efactor extract to [f]ile' })
-
-vim.keymap.set("x", "<leader>rv", ":Refactor extract_var ", { desc = '[r]efactor extract [v]ar' })
-
-vim.keymap.set({ "n", "x" }, "<leader>ri", ":Refactor inline_var", { desc = '[r]efactor [i]nline var' })
-
-vim.keymap.set("n", "<leader>rI", ":Refactor inline_func", { desc = '[r]efactor [I]nline func' })
-
-vim.keymap.set("n", "<leader>rb", ":Refactor extract_block", { desc = '[r]efactor extract [b]lock' })
-vim.keymap.set("n", "<leader>rbf", ":Refactor extract_block_to_file", { desc = '[r]efactor extract [b]lock to [f]ile' })
-
--- You can also use below = true here to to change the position of the printf
--- statement (or set two remaps for either one). This remap must be made in normal mode.
-vim.keymap.set(
-  "n",
-  "<leader>rp",
-  function() require('refactoring').debug.printf({ below = false }) end, { desc = '[r]efactor [p]rint execution' }
-)
-
-vim.keymap.set({ "x", "n" }, "<leader>rv", function() require('refactoring').debug.print_var() end,
-  { desc = '[r]efactor print [v]ar' })
-vim.keymap.set("n", "<leader>rc", function() require('refactoring').debug.cleanup({}) end,
-  { desc = '[r]efactor [c]leanup print statements' })
 
 -- [[ Configure Telescope ]]
 -- See `:help telescope` and `:help telescope.setup()`
@@ -398,14 +276,6 @@ require('nvim-treesitter.configs').setup {
     },
   },
 }
-
--- Diagnostic keymaps
-vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous diagnostic message' })
-vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next diagnostic message' })
-vim.keymap.set('n', '<leader>E', vim.diagnostic.open_float, { desc = 'Open floating diagnostic message' })
-vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostics list' })
-
-vim.keymap.set('n', '<leader>w', '<cmd>update<cr>', { desc = 'Write File' })
 
 -- [[ Configure LSP ]]
 --  This function gets run when an LSP connects to a particular buffer.
