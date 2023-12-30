@@ -20,6 +20,7 @@ return {
 
     -- Add your own debuggers here
     'leoluz/nvim-dap-go',
+    'mfussenegger/nvim-dap-python',
   },
   config = function()
     local dap = require 'dap'
@@ -83,5 +84,18 @@ return {
 
     -- Install golang specific config
     require('dap-go').setup()
+    require('dap-python').setup('~/.debugpy/bin/python')
+    dap.adapters.codelldb = {
+      type = 'server',
+      port = "${port}",
+      executable = {
+        -- CHANGE THIS to your path!
+        command = '/Users/robert/Downloads/codelldb/extension/adapter/codelldb',
+        args = { "--port", "${port}" },
+
+        -- On windows you may have to uncomment this:
+        -- detached = false,
+      }
+    }
   end,
 }
