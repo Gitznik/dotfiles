@@ -47,4 +47,6 @@ vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
 -- Draw column on line 80
-vim.o.colorcolumn = 80
+-- vim.o.colorcolumn = 80
+--
+vim.o.tabstop = 4
