@@ -1,6 +1,7 @@
 require("sets")
 require("remaps")
 
+
 -- Install package manager
 --    https://github.com/folke/lazy.nvim
 --    `:help lazy.nvim.txt` for more info
@@ -22,6 +23,7 @@ vim.opt.rtp:prepend(lazypath)
 --
 --  You can also configure plugins after the setup call,
 --    as they will be available in your neovim runtime.
+vim.o.termguicolors = true
 require('lazy').setup({
   -- NOTE: First, some plugins that don't require any configuration
 
@@ -92,10 +94,10 @@ require('lazy').setup({
   },
 
   {
-    'rebelot/kanagawa.nvim',
+    'catppuccin/nvim',
     priority = 1000,
     config = function()
-      vim.cmd.colorscheme 'kanagawa-wave'
+      vim.cmd.colorscheme 'catppuccin-macchiato'
     end,
   },
 
@@ -337,11 +339,24 @@ local servers = {
   -- pyright = {},
   -- rust_analyzer = {},
   -- tsserver = {},
-
+  yamlls = {
+    filetypes = { "yaml", "yaml.docker-compose", "yaml.gitlab", "yml" },
+    settings = {
+      yaml = {
+        schemas = {
+          ["https://raw.githubusercontent.com/instrumenta/kubernetes-json-schema/master/v1.30.9-standalone-strict/all.json" ] = "/*.k8s.yaml",
+          ["https://json.schemastore.org/github-workflow.json"] = "/.github/workflows/*",
+          ["https://raw.githubusercontent.com/argoproj/argo-workflows/main/api/jsonschema/schema.json"] = "argo/**/*.yaml"
+        },
+      },
+    },
+  },
   lua_ls = {
-    Lua = {
-      workspace = { checkThirdParty = false },
-      telemetry = { enable = false },
+    settings = {
+      Lua = {
+        workspace = { checkThirdParty = false },
+        telemetry = { enable = false },
+      },
     },
   },
 }
@@ -362,11 +377,9 @@ mason_lspconfig.setup {
 
 mason_lspconfig.setup_handlers {
   function(server_name)
-    require('lspconfig')[server_name].setup {
-      capabilities = capabilities,
-      on_attach = on_attach,
-      settings = servers[server_name],
-    }
+    local server = servers[server_name] or {}
+    server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
+    require('lspconfig')[server_name].setup(server)
   end,
 }
 

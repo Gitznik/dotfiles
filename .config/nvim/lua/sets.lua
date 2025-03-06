@@ -48,5 +48,7 @@ vim.g.loaded_netrwPlugin = 1
 
 -- Draw column on line 80
 -- vim.o.colorcolumn = 80
---
 vim.o.tabstop = 4
+
+-- Set python venv
+vim.g.python3_host_prog=vim.fn.expand("~/.venvs/neovim/bin/python3")
