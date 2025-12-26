@@ -1,0 +1,1 @@
+/home/robert/.config/omarchy/current/theme/neovim.lua
