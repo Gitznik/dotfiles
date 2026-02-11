@@ -123,6 +123,7 @@
   "pulseaudio": {
     "format": "{icon}",
     "on-click": "omarchy-launch-audio",
+    "on-click-middle": "omarchy-launch-or-focus-tui wiremix --tab output",
     "on-click-right": "pamixer -t",
     "tooltip-format": "Playing at {volume}%",
     "scroll-step": 5,
