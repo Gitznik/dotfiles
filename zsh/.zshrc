@@ -84,9 +84,12 @@ envexport() {
   set +o allexport
 }
 
+export PATH=/home/robert/.cargo/bin:$PATH
 autoload -Uz compinit && compinit
 add-zsh-hook -d precmd _antigen_compinit
+
 eval "$(fzf --zsh)"
 eval "$(zoxide init zsh)"
 eval "$(workmux completions zsh)"
+eval "$(COMPLETE=zsh prek)"
 eval "$(starship init zsh)"
