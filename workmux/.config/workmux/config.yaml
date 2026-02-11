@@ -1,0 +1,6 @@
+agent: opencode
+
+panes:
+  - focus: true
+  - command: <agent>
+    split: horizontal

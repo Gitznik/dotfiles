@@ -84,6 +84,9 @@ envexport() {
   set +o allexport
 }
 
+autoload -Uz compinit && compinit
+add-zsh-hook -d precmd _antigen_compinit
 eval "$(fzf --zsh)"
 eval "$(zoxide init zsh)"
+eval "$(workmux completions zsh)"
 eval "$(starship init zsh)"
