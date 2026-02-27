@@ -3,3 +3,4 @@
 if vim.lsp.inlay_hint then
   Snacks.toggle.inlay_hints():map("<leader>h")
 end
+
