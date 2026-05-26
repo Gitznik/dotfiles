@@ -2,5 +2,6 @@ agent: opencode
 
 panes:
   - focus: true
+    command: just generate
   - command: <agent>
     split: horizontal

@@ -85,7 +85,8 @@ envexport() {
 }
 
 export PATH=/home/robert/.cargo/bin:$PATH
-export PATH="$PATH:$(go env GOPATH)/bin"
+export GOBIN="$(go env GOPATH)/bin"
+export PATH="$PATH:$GOBIN"
 autoload -Uz compinit && compinit
 add-zsh-hook -d precmd _antigen_compinit
 
