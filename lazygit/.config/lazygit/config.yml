@@ -1,4 +1,9 @@
 git:
   pagers:
     - colorArg: always
-      pager: delta -s --dark --paging=never --24-bit-color=never
+      pager: delta -s --dark --paging=never --true-color=never --syntax-theme="Catppuccin Mocha"
+customCommands:
+  - key: 'F'
+    command: 'git pull --rebase --autostash'
+    context: 'localBranches'
+    output: log
