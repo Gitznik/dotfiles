@@ -62,6 +62,8 @@
       },
       "max-length": 50,
       "on-click": "playerctl play-pause",
+      "on-click-right": "playerctl next",
+      "on-click-middle": "playerctl previous",
       "on-scroll-up": "playerctl next",
       "on-scroll-down": "playerctl previous",
       "exec": "playerctl -a metadata --format '{\"text\": \"{{artist}} - {{title}}\", \"tooltip\": \"{{playerName}} : {{markup_escape(title)}}\", \"alt\": \"{{status}}\", \"class\": \"{{status}}\"}' -F",

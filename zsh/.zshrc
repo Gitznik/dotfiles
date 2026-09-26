@@ -84,6 +84,10 @@ envexport() {
   set +o allexport
 }
 
+if [[ -f "$HOME/.config/secrets/shell.env" ]]; then
+  envexport "$HOME/.config/secrets/shell.env"
+fi
+
 export PATH=/home/robert/.cargo/bin:$PATH
 export GOBIN="$(go env GOPATH)/bin"
 export PATH="$PATH:$GOBIN"
