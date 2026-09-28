@@ -1,0 +1,3 @@
+# Local config backups (omarchy, manual edits)
+*.bak.[0-9]*
+*.omarchy-upgrade-to-quattro.*.bak
