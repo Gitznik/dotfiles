@@ -36,6 +36,7 @@ o.bind("SUPER + D", "Omarchy menu", "omarchy-menu toggle")
 hl.unbind("SUPER + J")
 hl.unbind("SUPER + K")
 hl.unbind("SUPER + L")
+hl.unbind("SUPER + ALT + L") -- no workspace layout cycling (scrolling/floating)
 for key, dir in pairs({ H = "l", J = "d", K = "u", L = "r" }) do
   o.bind("SUPER + " .. key, nil, hl.dsp.focus({ direction = dir }))
   o.bind("SUPER + SHIFT + " .. key, nil, hl.dsp.window.swap({ direction = dir }))

@@ -50,6 +50,10 @@ alias wg_stg_down="wg-quick down alpas_stg"
 alias wg_all_up="wg_stg_up && wg_prod_up"
 alias wg_all_down="wg_stg_down && wg_prod_down"
 alias clipboard="wl-copy"
+alias uncap-gpu="sudo ryzenadj --slow-limit=30000"
+
+# Link PRs to knowledge-base tickets (Alpas-AI/dev-utils scripts/kb-pr-create)
+gh() { if [[ $1 == pr && $2 == create ]]; then shift 2; kb-pr-create "$@"; else command gh "$@"; fi }
 
 # File system
 if command -v eza &> /dev/null; then
@@ -99,3 +103,4 @@ eval "$(zoxide init zsh)"
 eval "$(workmux completions zsh)"
 eval "$(COMPLETE=zsh prek)"
 eval "$(starship init zsh)"
+export SQL_EDITOR=nvim  # lazysql: $EDITOR has args it cannot split
