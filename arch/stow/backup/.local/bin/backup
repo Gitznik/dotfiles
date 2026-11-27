@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Offsite backups of $HOME with restic (encrypted, deduplicated) over SFTP.
-#   backup init     one-time per machine: target, SSH key, repository password (keyring)
+# Offsite backups of $HOME with restic (encrypted, deduplicated) to an rclone remote
+# (e.g. the Synology over SMB/SFTP) or plain SFTP.
+#   backup init     one-time per machine: target, repository password (keyring)
 #   backup run      back up now, then prune and (weekly) check. The daily timer runs this.
 #   backup status   last success/failure; --waybar for the bar icon
 #   backup restic … any restic command against this machine's repository (snapshots,
@@ -22,17 +23,27 @@ load() {
   . "$target"
   export RESTIC_REPOSITORY=$BACKUP_REPO
   export RESTIC_PASSWORD_COMMAND="secret-tool lookup service restic-backup repository $BACKUP_REPO"
-  restic_opts=()
-  if [[ $BACKUP_REPO == sftp:* ]]; then
+  restic_opts=() ssh_host="" reach_host="" reach_port=""
+  if [[ $BACKUP_REPO == rclone:* ]]; then
+    # Reachability: the remote's host (smb/sftp: host + port, webdav: URL).
+    local remote=${BACKUP_REPO#rclone:}; remote=${remote%%:*}
+    local cfg; cfg=$(rclone config dump 2>/dev/null | jq -c --arg r "$remote" '.[$r] // {}')
+    case $(jq -r '.type // ""' <<<"$cfg") in
+      smb) reach_host=$(jq -r '.host' <<<"$cfg") reach_port=$(jq -r '.port // "445"' <<<"$cfg") ;;
+      sftp) reach_host=$(jq -r '.host' <<<"$cfg") reach_port=$(jq -r '.port // "22"' <<<"$cfg") ;;
+      webdav) reach_host=$(jq -r '.url' <<<"$cfg" | sed -E 's#^[a-z]+://([^/:]+).*#\1#') reach_port=443 ;;
+    esac
+  elif [[ $BACKUP_REPO == sftp:* ]]; then
     local spec=${BACKUP_REPO#sftp:}
     ssh_dest=${spec%%:*}; ssh_host=${ssh_dest#*@}
+    reach_host=$ssh_host reach_port=${BACKUP_SSH_PORT:-22}
     restic_opts=(-o "sftp.command=ssh -i $key -p ${BACKUP_SSH_PORT:-22} -o IdentitiesOnly=yes -o BatchMode=yes -o ServerAliveInterval=30 $ssh_dest -s sftp")
   fi
 }
 r() { restic "${restic_opts[@]}" "$@"; }
 reachable() {
-  [[ -n ${ssh_host:-} ]] || return 0   # local repositories are always reachable
-  timeout 5 bash -c "</dev/tcp/$ssh_host/${BACKUP_SSH_PORT:-22}" 2>/dev/null
+  [[ -n $reach_host ]] || return 0   # local repositories are always reachable
+  timeout 5 bash -c "</dev/tcp/$reach_host/$reach_port" 2>/dev/null
 }
 
 cmd_init() {
@@ -40,23 +51,34 @@ cmd_init() {
   if [[ -f $target ]]; then
     . "$target"; echo "Target: $BACKUP_REPO (edit $target to change)"
   else
-    local host user path port
-    read -rp "NAS/Storage Box host (e.g. nas.lan or 192.168.x.y): " host
-    read -rp "SFTP port [22]: " port
-    read -rp "SFTP user [restic]: " user
-    read -rp "Path on the server [/backup/restic/${HOSTNAME:-$(uname -n)}]: " path
-    port=${port:-22} user=${user:-restic} path=${path:-/backup/restic/${HOSTNAME:-$(uname -n)}}
-    printf 'BACKUP_REPO="sftp:%s@%s:%s"\nBACKUP_SSH_PORT=%s\n' "$user" "$host" "$path" "$port" >"$target"
+    local backend host user path port remote
+    read -rp "Backend: rclone remote or plain sftp [rclone]: " backend
+    if [[ ${backend:-rclone} == rclone ]]; then
+      echo "rclone remotes: $(rclone listremotes | tr '\n' ' ')"
+      read -rp "Remote for the backups (create one first with 'rclone config'): " remote
+      remote=${remote%:}
+      rclone listremotes | grep -qx "$remote:" || die "no rclone remote '$remote' (see arch/README.md 'Backups')"
+      read -rp "Path on the remote [backup/restic/${HOSTNAME:-$(uname -n)}]: " path
+      path=${path:-backup/restic/${HOSTNAME:-$(uname -n)}}
+      printf 'BACKUP_REPO="rclone:%s:%s"\n' "$remote" "$path" >"$target"
+    else
+      read -rp "SFTP host (e.g. 192.168.x.y): " host
+      read -rp "SFTP port [22]: " port
+      read -rp "SFTP user [restic]: " user
+      read -rp "Path on the server [/backup/restic/${HOSTNAME:-$(uname -n)}]: " path
+      port=${port:-22} user=${user:-restic} path=${path:-/backup/restic/${HOSTNAME:-$(uname -n)}}
+      printf 'BACKUP_REPO="sftp:%s@%s:%s"\nBACKUP_SSH_PORT=%s\n' "$user" "$host" "$path" "$port" >"$target"
+    fi
     . "$target"
   fi
-  if [[ ! -f $key ]]; then
-    ssh-keygen -q -t ed25519 -N '' -C "backup@${HOSTNAME:-$(uname -n)}" -f "$key"
+  if [[ $BACKUP_REPO == sftp:* ]]; then
+    [[ -f $key ]] || ssh-keygen -q -t ed25519 -N '' -C "backup@${HOSTNAME:-$(uname -n)}" -f "$key"
+    echo; echo "Backup SSH key (add it to the backup user on the server, see arch/README.md 'Backups'):"
+    cat "$key.pub"; echo
+    read -rp "Press Enter once the key is installed on the server..."
   fi
-  echo; echo "Backup SSH key (add it to the backup user on the server, see arch/README.md 'Backups'):"
-  cat "$key.pub"; echo
-  read -rp "Press Enter once the key is installed on the server..."
   load
-  reachable || die "$ssh_host:${BACKUP_SSH_PORT:-22} isn't reachable"
+  reachable || die "$reach_host:$reach_port isn't reachable"
   if ! secret-tool lookup service restic-backup repository "$BACKUP_REPO" >/dev/null 2>&1; then
     local pw
     read -rsp "Repository password (empty = generate a new one; use the Bitwarden copy for an existing repository): " pw; echo
@@ -80,7 +102,7 @@ cmd_init() {
 cmd_run() {
   load
   if ! reachable; then
-    echo "backup: $ssh_host not reachable (away from home?), skipping"; exit 0
+    echo "backup: $reach_host not reachable (away from home?), skipping"; exit 0
   fi
   echo "started $(date -Is)" >"$state/running"
   trap 'rm -f "$state/running"' EXIT

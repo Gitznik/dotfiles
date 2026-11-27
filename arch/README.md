@@ -130,7 +130,7 @@ The VM needs a virtio GPU with 3D/GL acceleration, or Hyprland won't start. `jus
 
 ### Backup checks
 
-- [ ] Bar shows the backup icon (peach) until `backup init` is done; after a first `backup run` it disappears
+- [ ] Bar shows the backup icon (peach) until `backup init` is done; after a first `backup run` it disappears. `backup init` works with an rclone remote (SMB to the Synology)
 - [ ] `backup status` shows the target, last success and the timer; `backup restic snapshots` lists a snapshot per run
 - [ ] `backup restic restore latest --target /tmp/r --include ~/Documents` restores files; a dir with `.nobackup` and the excludes (`~/.cache`, Trash, Downloads, …) aren't in the snapshot
 - [ ] With the NAS unreachable, `backup run` skips with a message and exits 0; a failing run shows a critical notification and a red icon
@@ -141,15 +141,24 @@ The VM needs a virtio GPU with 3D/GL acceleration, or Hyprland won't start. `jus
 
 ## Backups
 
-`backup` (restic over SFTP) backs up `~` daily (systemd user timer, catches up after the laptop was off) to the Synology, later also a Hetzner Storage Box: encrypted, deduplicated, kept 7 daily / 4 weekly / 12 monthly, checked weekly. Excludes: `~/.config/backup/excludes` (caches, Trash, Steam/Games, mise, Downloads, VMs, `node_modules`, `target/…`, `.venv`); put a `.nobackup` file in any other dir to skip it. Away from home the NAS isn't reachable and runs skip quietly. A bar icon appears when backups are failing, overdue (3 days) or not set up.
+`backup` (restic, through an rclone remote like everything else) backs up `~` daily (systemd user timer, catches up after the laptop was off) to the Synology, later also a Hetzner Storage Box: encrypted, deduplicated, kept 7 daily / 4 weekly / 12 monthly, checked weekly. Excludes: `~/.config/backup/excludes` (caches, Trash, Steam/Games, mise, Downloads, VMs, `node_modules`, `target/…`, `.venv`); put a `.nobackup` file in any other dir to skip it. Away from home the NAS isn't reachable and runs skip quietly. A bar icon appears when backups are failing, overdue (3 days) or not set up.
 
-**Synology, once:** DSM > Control Panel > File Services > FTP: enable SFTP. Create a shared folder `backup` (Btrfs volume) and a user `restic` with read/write on `backup` only and no other app permissions. Enable User Home (needed for its `~/.ssh/authorized_keys`). Protect against a compromised laptop deleting backups: Snapshot Replication > snapshots of `backup`, daily, **immutable** for at least 7 days.
+**Synology, once:** a shared folder `backup` (Btrfs volume) and a user `restic` with read/write on `backup` only and no other app permissions. SMB (Control Panel > File Services > SMB) must be on. Protect against a compromised laptop deleting backups: install Snapshot Replication (Package Center), then Snapshots > `backup` > Settings: daily schedule, **immutable** snapshots for at least 7 days (DSM 7.2+), retention ≥ that.
 
-**Each machine, once:** `backup init`: asks for the host, user and path (stored only in `~/.config/backup/target.env`, never in this public repo), creates a dedicated SSH key `~/.ssh/backup_ed25519` for the server, generates the repository password (keep the printed copy in **Bitwarden**: without it no restore on another machine) and stores it in the keyring. Then `backup run` (or the bar icon, or `just backup`).
+**Each machine, once:**
 
-**Restore:** `backup restic snapshots`, `backup restic mount ~/mnt` (browse), `backup restic restore latest --target ~/restore --include ~/Documents`. On a new machine: `backup init` with the same target and the Bitwarden password.
+```sh
+read -rsp 'restic user password: ' PW; echo
+rclone config create robonas smb host=<NAS IP> user=restic pass="$PW"   # rclone obscures it
+rclone lsd robonas:backup                                              # check: lists the folder
+backup init      # backend rclone, remote robonas, path backup/restic/<host>
+```
 
-**Hetzner Storage Box later:** a second repository (`sftp:uXXXX@uXXXX.your-storagebox.de:restic/<host>`, port 23); `backup` reads one target today, a second one is a small extension.
+`backup init` stores the target only in `~/.config/backup/target.env` (never in this public repo), generates the repository password (keep the printed copy in **Bitwarden**: without it no restore on another machine) and stores it in the keyring, creates the repository and enables the timer. Then `backup run` (or the bar icon, or `just backup`). The NAS password lives in `~/.config/rclone/rclone.conf` like other remotes; keep it in Bitwarden too. Plain SFTP with a dedicated key is still supported (`backend: sftp`), but needs the key installed on the NAS over admin SSH.
+
+**Restore:** `backup restic snapshots`, `backup restic mount ~/mnt` (browse), `backup restic restore latest --target ~/restore --include ~/Documents`. On a new machine: same rclone remote, then `backup init` with the same path and the Bitwarden password.
+
+**Hetzner Storage Box later:** another rclone remote (sftp or smb on the Storage Box) and a second repository; `backup` reads one target today, a second one is a small extension.
 
 ## Notes
 
