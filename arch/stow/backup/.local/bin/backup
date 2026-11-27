@@ -44,13 +44,13 @@ cmd_init() {
     read -rp "NAS/Storage Box host (e.g. nas.lan or 192.168.x.y): " host
     read -rp "SFTP port [22]: " port
     read -rp "SFTP user [restic]: " user
-    read -rp "Path on the server [/backup/restic/$(hostname)]: " path
-    port=${port:-22} user=${user:-restic} path=${path:-/backup/restic/$(hostname)}
+    read -rp "Path on the server [/backup/restic/${HOSTNAME:-$(uname -n)}]: " path
+    port=${port:-22} user=${user:-restic} path=${path:-/backup/restic/${HOSTNAME:-$(uname -n)}}
     printf 'BACKUP_REPO="sftp:%s@%s:%s"\nBACKUP_SSH_PORT=%s\n' "$user" "$host" "$path" "$port" >"$target"
     . "$target"
   fi
   if [[ ! -f $key ]]; then
-    ssh-keygen -q -t ed25519 -N '' -C "backup@$(hostname)" -f "$key"
+    ssh-keygen -q -t ed25519 -N '' -C "backup@${HOSTNAME:-$(uname -n)}" -f "$key"
   fi
   echo; echo "Backup SSH key (add it to the backup user on the server, see arch/README.md 'Backups'):"
   cat "$key.pub"; echo
