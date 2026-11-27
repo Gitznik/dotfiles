@@ -61,7 +61,7 @@ The VM needs a virtio GPU with 3D/GL acceleration, or Hyprland won't start. `jus
 
 ### Milestone 2 checks (bar and quick controls)
 
-- [ ] Waybar starts with the session (`systemctl --user status waybar`): workspaces left, clock center, tray / Bluetooth / network / audio / battery / power right. Catppuccin colors; Nerd Font icons render (no boxes)
+- [ ] Waybar starts with the session (`systemctl --user status waybar`): workspaces left, stay-awake / DND / clock center, tray / Bluetooth / network / audio / battery / power right. Catppuccin colors; Nerd Font icons render (no boxes)
 - [ ] Clock shows date, time and UTC offset (e.g. `UTC+0100`); hovering shows a month calendar
 - [ ] Workspace buttons follow `SUPER+1…0` and switch on click
 - [ ] Bluetooth icon: click opens `bluetui` as a centered floating window; clicking again focuses it instead of opening a second one. Pair/connect a device (hardware)

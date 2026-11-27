@@ -6,8 +6,8 @@
   "spacing": 0,
   "reload_style_on_change": true,
   "modules-left": ["hyprland/workspaces"],
-  "modules-center": ["clock"],
-  "modules-right": ["tray", "custom/stay-awake", "custom/dnd", "bluetooth", "network", "wireplumber", "battery", "custom/system"],
+  "modules-center": ["custom/stay-awake", "custom/dnd", "clock"],
+  "modules-right": ["tray", "bluetooth", "network", "wireplumber", "battery", "custom/system"],
 
   "hyprland/workspaces": {
     "on-click": "activate",
