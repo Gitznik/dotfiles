@@ -77,6 +77,10 @@ ttf-jetbrains-mono-nerd
 noto-fonts
 noto-fonts-emoji
 
+# Node LTS up front: bitwarden-cli needs nodejs-lts-jod, and AUR builds that want "nodejs"
+# (asar for opencode-desktop) would otherwise pull the conflicting current nodejs.
+nodejs-lts-jod
+
 # Shell and terminal tools
 zsh
 mise
