@@ -11,7 +11,8 @@
 
   "hyprland/workspaces": {
     "on-click": "activate",
-    "format": "{name}"
+    "format": "{name}",
+    "persistent-workspaces": { "*": 10 }
   },
   "clock": {
     "format": "{:%a %d %b  %H:%M  UTC%z}",
