@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# Waybar (custom/dotfiles): shows an icon when ~/dotfiles is behind its remote branch; empty
+# output hides the module. Click runs `just update`.
+repo=$HOME/dotfiles
+hidden='{"text": ""}'
+git -C "$repo" fetch --quiet 2>/dev/null || { echo "$hidden"; exit 0; }   # offline
+behind=$(git -C "$repo" rev-list --count HEAD..@{u} 2>/dev/null || echo 0)
+if ((behind > 0)); then
+  branch=$(git -C "$repo" branch --show-current)
+  printf '{"text": "󰚰", "class": "behind", "tooltip": "dotfiles: %s new commit(s) on %s. Click to update."}\n' "$behind" "$branch"
+else
+  echo "$hidden"
+fi

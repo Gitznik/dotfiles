@@ -46,6 +46,7 @@ tooltip {
 
 #clock,
 #tray,
+#custom-dotfiles,
 #custom-stay-awake,
 #custom-dnd,
 #bluetooth,
@@ -60,6 +61,7 @@ tooltip {
   margin-right: 4px;
 }
 
+#custom-dotfiles.behind,
 #custom-stay-awake.on,
 #custom-dnd.on {
   color: @peach;

@@ -7,12 +7,15 @@ Plain Arch + Hyprland, no Omarchy. Shared dotfiles (`zsh tmux nvim lazygit workm
 Decide these per machine. Don't script them:
 
 - [ ] Target disk confirmed (`lsblk`). Don't use the daily driver's disk.
-- [ ] LUKS full-disk encryption (required: auto-login relies on the disk passphrase), bootloader, kernel (`linux` + `linux-headers`), microcode (`amd-ucode`/`intel-ucode`)
+- [ ] LUKS full-disk encryption (required: auto-login relies on the disk passphrase), kernel (`linux` + `linux-headers`), microcode (`amd-ucode`/`intel-ucode`)
+- [ ] btrfs root with archinstall's default subvolumes, **Limine** as bootloader (snapshot boot entries via `limine-snapper-sync`; with systemd-boot or GRUB the bootstrap still takes snapshots, but rolling back needs a live USB), zram swap (archinstall's swap option)
 - [ ] Boot splash for the LUKS prompt: `plymouth` package installed, `plymouth` in mkinitcpio `HOOKS` after `base udev`/`systemd` and before `encrypt`/`sd-encrypt`, `quiet splash` on the kernel command line (bootloader-specific; with a UKI it's `/etc/kernel/cmdline`), then `mkinitcpio -P`. The bootstrap installs the theme and warns if the hook or `splash` is missing. A serial console on the command line (`console=ttyS0`/`uart`) makes Plymouth fall back to text
 - [ ] User in `wheel` with sudo
 - [ ] Private machines: `[multilib]` enabled in `/etc/pacman.conf` (Steam)
 - [ ] Packages: `base base-devel git networkmanager`, with `NetworkManager` enabled so the first boot has network
 - [ ] Boots to a TTY login
+
+**Framework laptops** (the plan for all machines): update the BIOS first (`fwupdmgr update`, or Framework's USB updater). Set the battery charge limit (e.g. 80%) in the BIOS or with `framework_tool --charge-limit 80` (the bootstrap installs `framework-system` on Framework hardware): useful when the laptop lives docked. The Framework 16 keyboard/input modules get a udev rule for VIA/`qmk_hid`. Intel models get `thermald`, media drivers and `sof-firmware`; AMD models the Radeon Vulkan driver.
 
 Keep Wi-Fi passwords, SSH/GPG keys and tokens out of this repo. SSH keys live in Bitwarden: pull them from there on each machine (step 2), never copy them between machines or commit them.
 
@@ -28,7 +31,11 @@ Apps come in three lists: `apps-shared.txt` (every machine), `apps-work.txt`, `a
 
 **Real machines only (not the VM):** SSH keys stay in Bitwarden and are never written to disk. Log into the Bitwarden desktop app, enable Settings > SSH agent, and keep the keys as SSH key items. `~/.config/environment.d/ssh-agent.conf` points `SSH_AUTH_SOCK` at `~/.bitwarden-ssh-agent.sock` for every app and user service (takes effect after a reboot). Then switch the remote: `git -C ~/dotfiles remote set-url origin git@github.com:Gitznik/dotfiles.git`.
 
-**Keyring:** the first app that stores a login (Element, Chromium, Slack…) asks for a new keyring password. Leave it **empty**: auto-login never types a password, so a password-protected keyring would prompt on every boot, and the disk is already encrypted by LUKS.
+**Keyring:** the bootstrap pre-creates an unencrypted default keyring, so apps store logins without asking: auto-login never types a password (a protected keyring would prompt every boot), and the disk is already encrypted by LUKS.
+
+**Updating:** `just update` (or the update icon left of the clock, shown when the dotfiles are behind GitHub): pulls the dotfiles, `yay -Syu` (snap-pac snapshots each transaction), reruns the bootstrap, `mise upgrade`, and lists firmware updates.
+
+**Web apps:** add a line to `arch/webapps.txt` (profile, name, URL, icon) and rerun the bootstrap: it creates a Chromium app window with its own launcher entry.
 
 The bootstrap installs `packages-repo.txt` and `packages-aur.txt`, checks for conflicts with existing files, stows the shared and desktop packages, installs the greetd config, enables services and sets zsh as the login shell. If any file would be overwritten, it stops before changing anything. Rerunning it is safe.
 
@@ -108,6 +115,18 @@ The VM needs a virtio GPU with 3D/GL acceleration, or Hyprland won't start. `jus
 - [ ] `docker run --rm hello-world` works without sudo after re-login
 - [ ] Element/Chromium login survives a reboot (keyring with an empty password)
 - [ ] `ssh-add -l` lists the keys from Bitwarden's agent (real machines)
+
+### System, hardware and update checks
+
+- [ ] `snapper -c root list` shows pre/post pairs after a `yay` install; with Limine, the boot menu lists snapshots (hardware)
+- [ ] `zramctl` shows zram swap; `sysctl fs.inotify.max_user_watches` is 524288; `ulimit -n` in a service is 65536
+- [ ] 3 wrong passwords on the lock screen don't lock the account for 10 minutes (`faillock` allows 10, unlocks after 2 min)
+- [ ] `avahi-browse -at` lists network services; a network printer shows up in `system-config-printer` (hardware)
+- [ ] `docker run --rm alpine nslookup archlinux.org` resolves with ufw active
+- [ ] Docked with the lid closed: the laptop panel is off (`hyprctl monitors all` shows it disabled), workspaces and cursor stay on the external display; opening the lid turns it back on; booting with the lid closed starts on the external display only (hardware)
+- [ ] `just update` runs through; the update icon appears when the dotfiles are behind and disappears after updating
+- [ ] Deezer opens from `SUPER+D` as its own app window with its icon
+- [ ] Framework: `framework_tool --power` reports battery/charger; Wi-Fi regulatory domain set (`iw reg get`) (hardware)
 
 ### Later milestones (from the inventory)
 

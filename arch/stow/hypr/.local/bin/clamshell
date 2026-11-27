@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# Clamshell: with the lid closed and another display connected, turn the laptop panel off;
+# otherwise make sure it's on. Idempotent; run on lid switch, start, reload, monitor changes.
+# Idea after Omarchy 4.5.0 omarchy-hyprland-monitor-clamshell (MIT), much reduced.
+set -euo pipefail
+monitors=$(hyprctl monitors all -j)
+internal=$(jq -r '.[] | select(.name | test("^(eDP|LVDS|DSI)-")) | .name' <<<"$monitors" | head -n1)
+[[ -n $internal ]] || exit 0   # not a laptop
+
+closed=false
+grep -qs closed /proc/acpi/button/lid/*/state && closed=true
+external=$(jq --arg i "$internal" '[.[] | select(.name != $i and .name != "FALLBACK" and .disabled == false)] | length' <<<"$monitors")
+disabled=$(jq -r --arg i "$internal" '.[] | select(.name == $i) | .disabled' <<<"$monitors")
+
+if $closed && ((external > 0)); then
+  [[ $disabled == true ]] || hyprctl eval "hl.monitor({ output = \"$internal\", disabled = true })" >/dev/null
+elif [[ $disabled == true ]]; then
+  hyprctl eval "hl.monitor({ output = \"$internal\", mode = \"preferred\", position = \"auto\", scale = 1 })" >/dev/null
+fi

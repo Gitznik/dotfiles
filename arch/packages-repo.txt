@@ -57,6 +57,10 @@ playerctl
 brightnessctl
 swayosd
 cups
+avahi
+nss-mdns
+wireless-regdb
+pciutils
 system-config-printer
 ufw
 power-profiles-daemon

@@ -30,6 +30,9 @@ for ws = 1, 10 do
   bind("SUPER + SHIFT + " .. key, hl.dsp.window.move({ workspace = tostring(ws), follow = true }))
 end
 
+bind("switch:on:Lid Switch", hl.dsp.exec_cmd("$HOME/.local/bin/clamshell"), { locked = true })
+bind("switch:off:Lid Switch", hl.dsp.exec_cmd("$HOME/.local/bin/clamshell"), { locked = true })
+
 -- Media and brightness keys: work on the lock screen, repeat while held. swayosd shows the level.
 local held = { locked = true, repeating = true }
 bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("swayosd-client --output-volume raise"), held)

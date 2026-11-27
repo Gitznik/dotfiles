@@ -1,0 +1,4 @@
+# Web apps: Chromium app windows with their own launcher entry (SUPER+D) and icon.
+# profile | name | url | icon (PNG URL, e.g. from cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons)
+# profile is shared, work or private, like the apps-*.txt lists. bootstrap.sh generates the entries.
+shared | Deezer | https://www.deezer.com | https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/deezer.png

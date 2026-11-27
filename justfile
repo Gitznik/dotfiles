@@ -6,6 +6,10 @@ stow-all:
 arch-bootstrap:
   arch/bootstrap.sh
 
+# Plain Arch workstation: system packages, dotfiles + bootstrap, mise tools, firmware check
+update:
+  arch/update.sh
+
 # Arch test VM: iso | create | install | seal | reset | run | ssh-key | ssh (see arch/vm/vm.sh)
 [positional-arguments]
 vm *args:

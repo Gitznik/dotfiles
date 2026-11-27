@@ -6,7 +6,7 @@
   "spacing": 0,
   "reload_style_on_change": true,
   "modules-left": ["hyprland/workspaces"],
-  "modules-center": ["custom/stay-awake", "custom/dnd", "clock"],
+  "modules-center": ["custom/dotfiles", "custom/stay-awake", "custom/dnd", "clock"],
   "modules-right": ["tray", "bluetooth", "network", "wireplumber", "battery", "custom/system"],
 
   "hyprland/workspaces": {
@@ -59,6 +59,13 @@
     "format-full": "󰁹",
     "format-icons": ["󰁺", "󰁼", "󰁾", "󰂀", "󰂂"],
     "states": { "warning": 20, "critical": 10 }
+  },
+  "custom/dotfiles": {
+    "exec": "$HOME/.local/bin/dotfiles-status",
+    "return-type": "json",
+    "interval": 1800,
+    "signal": 10,
+    "on-click": "uwsm-app -- ghostty --wait-after-command=true -e just -f $HOME/dotfiles/justfile update"
   },
   "custom/stay-awake": {
     "exec": "$HOME/.local/bin/stay-awake status",
