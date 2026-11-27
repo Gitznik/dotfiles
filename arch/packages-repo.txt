@@ -32,6 +32,7 @@ noto-fonts-emoji
 
 # Shell and terminal tools
 zsh
+mise
 tmux
 neovim
 fzf

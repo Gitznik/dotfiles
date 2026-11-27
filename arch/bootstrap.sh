@@ -4,7 +4,7 @@
 set -euo pipefail
 
 repo=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
-common=(zsh tmux nvim lazygit workmux)
+common=(zsh tmux nvim lazygit workmux mise)
 desktop=(hypr ghostty services swaylock screensaver)
 system_services=(NetworkManager.service bluetooth.service)
 user_services=(hyprpolkitagent.service hypridle.service elephant.service walker.service)
@@ -44,6 +44,9 @@ step "Linking dotfiles"
 # arch/ as a missing root package. Plain stow is idempotent; remove stale links with stow -D.
 stow -d "$repo" -t "$HOME" "${common[@]}"
 stow -d "$repo/arch/stow" -t "$HOME" "${desktop[@]}"
+
+step "mise tools (global config)"
+mise install --yes
 
 step "Services"
 sudo systemctl enable --now "${system_services[@]}"

@@ -92,6 +92,7 @@ if [[ -f "$HOME/.config/secrets/shell.env" ]]; then
   envexport "$HOME/.config/secrets/shell.env"
 fi
 
+command -v mise &>/dev/null && eval "$(mise activate zsh)"
 export PATH=/home/robert/.cargo/bin:$PATH
 if command -v go &>/dev/null; then
   export GOBIN="$(go env GOPATH)/bin"
