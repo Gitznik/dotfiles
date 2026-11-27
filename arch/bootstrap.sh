@@ -62,7 +62,9 @@ fi
 if [[ $(plymouth-set-default-theme) != gitznik || ${theme_changed:-0} == 1 ]]; then
   sudo plymouth-set-default-theme -R gitznik   # -R rebuilds the initramfs
 fi
-grep -hE '^\s*HOOKS(\+)?=' /etc/mkinitcpio.conf /etc/mkinitcpio.conf.d/*.conf 2>/dev/null | grep -qw plymouth ||
+# grep exits 2 when mkinitcpio.conf.d/ has no *.conf; keep that from failing the check under pipefail.
+hooks=$(grep -hsE '^\s*HOOKS(\+)?=' /etc/mkinitcpio.conf /etc/mkinitcpio.conf.d/*.conf || true)
+grep -qw plymouth <<<"$hooks" ||
   echo "bootstrap: WARNING: no plymouth hook in mkinitcpio HOOKS, so the theme won't show (see README step 1)" >&2
 grep -qw splash /proc/cmdline ||
   echo "bootstrap: WARNING: 'splash' missing from kernel cmdline, so the theme won't show (see README step 1)" >&2
