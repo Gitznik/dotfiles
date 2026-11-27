@@ -35,7 +35,7 @@ Apps come in three lists: `apps-shared.txt` (every machine), `apps-work.txt`, `a
 
 **Updating:** `just update` (or the update icon left of the clock, shown when the dotfiles are behind GitHub): pulls the dotfiles, `yay -Syu` (snap-pac snapshots each transaction), reruns the bootstrap, `mise upgrade`, and lists firmware updates.
 
-**Web apps:** add a line to `arch/webapps.txt` (profile, name, URL, icon) and rerun the bootstrap: it creates a Chromium app window with its own launcher entry.
+**Web apps:** `webapp add NAME URL [ICON_URL] [--profile work|private]` adds a Chromium app window with its own launcher entry (`SUPER+D`) and icon (looked up in dashboard-icons when not given), listed in `arch/webapps.txt`; commit that file to get it on every machine. `webapp list`, `webapp remove NAME`.
 
 The bootstrap installs `packages-repo.txt` and `packages-aur.txt`, checks for conflicts with existing files, stows the shared and desktop packages, installs the greetd config, enables services and sets zsh as the login shell. If any file would be overwritten, it stops before changing anything. Rerunning it is safe.
 
@@ -125,7 +125,7 @@ The VM needs a virtio GPU with 3D/GL acceleration, or Hyprland won't start. `jus
 - [ ] `docker run --rm alpine nslookup archlinux.org` resolves with ufw active
 - [ ] Docked with the lid closed: the laptop panel is off (`hyprctl monitors all` shows it disabled), workspaces and cursor stay on the external display; opening the lid turns it back on; booting with the lid closed starts on the external display only (hardware)
 - [ ] `just update` runs through; the update icon appears when the dotfiles are behind and disappears after updating
-- [ ] Deezer opens from `SUPER+D` as its own app window with its icon
+- [ ] Deezer opens from `SUPER+D` as its own app window with its icon; `webapp add Test https://example.com` adds an entry right away, `webapp remove Test` removes it
 - [ ] Framework: `framework_tool --power` reports battery/charger; Wi-Fi regulatory domain set (`iw reg get`) (hardware)
 
 ### Later milestones (from the inventory)

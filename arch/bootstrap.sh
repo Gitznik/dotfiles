@@ -175,33 +175,7 @@ if ! compgen -G "$kr/*.keyring" >/dev/null; then
 fi
 
 step "Web apps (arch/webapps.txt)"
-apps_dir=$HOME/.local/share/applications icons_dir=$HOME/.local/share/icons/webapps
-mkdir -p "$apps_dir" "$icons_dir"
-wanted=()
-while IFS='|' read -r prof name url icon; do
-  prof=$(xargs <<<"$prof") name=$(xargs <<<"$name") url=$(xargs <<<"$url") icon=$(xargs <<<"$icon")
-  [[ -z $prof || $prof == \#* ]] && continue
-  [[ $prof == shared || " ${profiles[*]} " == *" $prof "* ]] || continue
-  slug=$(tr '[:upper:] ' '[:lower:]-' <<<"$name")
-  host=${url#*://}; host=${host%%/*}
-  [[ -f $icons_dir/$slug.png ]] || curl -fsSL "$icon" -o "$icons_dir/$slug.png" || echo "bootstrap: no icon for $name" >&2
-  cat >"$apps_dir/webapp-$slug.desktop" <<DESKTOP
-[Desktop Entry]
-# Managed by arch/bootstrap.sh (arch/webapps.txt)
-Type=Application
-Name=$name
-Exec=chromium --app=$url
-Icon=$icons_dir/$slug.png
-StartupWMClass=chrome-${host}__-Default
-Categories=Network;
-DESKTOP
-  wanted+=("webapp-$slug.desktop")
-done <"$repo/arch/webapps.txt"
-# Drop generated entries that are no longer listed.
-for f in "$apps_dir"/webapp-*.desktop; do
-  [[ -e $f ]] || continue
-  grep -q 'Managed by arch/bootstrap.sh' "$f" && [[ " ${wanted[*]} " != *" ${f##*/} "* ]] && rm -f "$f"
-done
+"$repo/arch/webapps.sh" sync
 
 step "Services"
 sudo systemctl enable --now "${system_services[@]}"
