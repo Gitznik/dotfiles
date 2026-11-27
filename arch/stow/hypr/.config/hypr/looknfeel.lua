@@ -26,4 +26,7 @@ hl.config({
 
 hl.window_rule({ match = { fullscreen = true }, border_size = 0 })
 
+-- Screenshot annotation (satty): app id differs between versions.
+hl.window_rule({ match = { class = "(com\\.gabm\\.satty|org\\.satty\\.satty)" }, float = true, center = true })
+
 hl.window_rule({ match = { class = "local.screensaver" }, workspace = "special:screensaver", fullscreen = true })

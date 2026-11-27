@@ -5,4 +5,5 @@ elephant-bin
 elephant-desktopapplications-bin
 elephant-providerlist-bin
 elephant-menus-bin
+elephant-clipboard-bin
 ttfx

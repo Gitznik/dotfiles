@@ -1,0 +1,18 @@
+# satty 0.22. Enter = copy to clipboard + save file + exit; Ctrl+S = save only; Esc = discard.
+[general]
+initial-tool = "arrow"
+copy-command = "wl-copy"
+output-filename = "~/Pictures/Screenshots/%Y-%m-%d_%H-%M-%S.png"
+save-after-copy = true
+early-exit = true
+actions-on-enter = ["save-to-clipboard"]
+actions-on-escape = ["exit"]
+no-window-decoration = true
+
+[font]
+family = "JetBrainsMono Nerd Font"
+style = "Regular"
+
+# Catppuccin Mocha: red, peach, yellow, green, blue, mauve
+[color-palette]
+palette = ["#f38ba8ff", "#fab387ff", "#f9e2afff", "#a6e3a1ff", "#89b4faff", "#cba6f7ff"]

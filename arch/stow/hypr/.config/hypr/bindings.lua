@@ -8,6 +8,8 @@ end
 bind("SUPER + RETURN", "ghostty")
 bind("SUPER + D", hl.dsp.exec_cmd("walker"))
 bind("SUPER + E", "nautilus --new-window")
+bind("PRINT", hl.dsp.exec_cmd("$HOME/.local/bin/screenshot"))
+bind("SUPER + CTRL + V", hl.dsp.exec_cmd("walker -m clipboard"))
 
 bind("SUPER + W", hl.dsp.window.close())
 bind("SUPER + T", hl.dsp.window.float({ action = "toggle" }))

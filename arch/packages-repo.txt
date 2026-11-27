@@ -29,6 +29,11 @@ waybar
 bluetui
 wiremix
 
+# Screenshots
+grim
+slurp
+satty
+
 # Desktop apps
 ghostty
 nautilus

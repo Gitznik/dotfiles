@@ -1,6 +1,6 @@
 # Arch workstation
 
-Plain Arch + Hyprland, no Omarchy. Shared dotfiles (`zsh tmux nvim lazygit workmux`) live at the repo root. The Arch-only desktop lives in `arch/stow/` (`hypr ghostty services swaylock screensaver waybar walker elephant tui`), plus `arch/etc/` for system files. The Omarchy machine keeps using `just stow-all` on `main` and never stows `arch/stow/`.
+Plain Arch + Hyprland, no Omarchy. Shared dotfiles (`zsh tmux nvim lazygit workmux`) live at the repo root. The Arch-only desktop lives in `arch/stow/` (`hypr ghostty services swaylock screensaver waybar walker elephant tui screenshot`), plus `arch/etc/` for system files. The Omarchy machine keeps using `just stow-all` on `main` and never stows `arch/stow/`.
 
 ## 1. Base install (per machine, by hand or `archinstall`)
 
@@ -70,11 +70,18 @@ The VM needs a virtio GPU with 3D/GL acceleration, or Hyprland won't start. `jus
 - [ ] Battery shows on laptops, is hidden in the VM
 - [ ] `SUPER+ESCAPE` and the power icon open the System menu; typing `lock`/`suspend` in `SUPER+D` finds the same entries. Lock, log out and reboot work from it
 
+### Milestone 3 checks (screenshots and clipboard)
+
+- [ ] `PRINT`: drag a region, or click a window to select it; `PRINT` again or Esc while selecting cancels
+- [ ] satty opens floating and centered with the shot; arrow tool active, Catppuccin palette; draw, add text, blur
+- [ ] Enter: annotated image is on the clipboard (paste into another app) **and** saved to `~/Pictures/Screenshots/`; satty closes
+- [ ] Esc in satty discards: nothing saved, clipboard unchanged
+- [ ] `SUPER+CTRL+V` opens the clipboard history in walker; copy 3 text items, pick the 2nd, `Ctrl+V` pastes it; a screenshot shows up as an image entry
+
 ### Later milestones (from the inventory)
 
-1. Screenshot on `PRINT`; clipboard history via `elephant-clipboard`
-2. Notifications with DND + screen-share DND script; crash notifications
-3. Hardware: dock/lid, suspend/resume, second display (workspaces stay global), portal screen sharing
+1. Notifications with DND + screen-share DND script; crash notifications
+2. Hardware: dock/lid, suspend/resume, second display (workspaces stay global), portal screen sharing
 
 ## Notes
 

@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# PRINT: drag a region or click a window, then annotate in satty. Enter copies to the
+# clipboard and saves to ~/Pictures/Screenshots (see ~/.config/satty/config.toml); Esc discards.
+# Pressing PRINT again while selecting cancels.
+set -euo pipefail
+pkill -x slurp && exit 0
+mkdir -p "$HOME/Pictures/Screenshots"
+
+ws=$(hyprctl activeworkspace -j | jq .id)
+windows=$(hyprctl clients -j | jq -r --argjson ws "$ws" \
+  '.[] | select(.workspace.id == $ws) | "\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"')
+
+region=$(slurp -d -b '#1e1e2e66' -c '#cba6f7ff' -s '#00000000' -w 2 <<<"$windows") || exit 0
+grim -g "$region" -t ppm - | satty --filename -
