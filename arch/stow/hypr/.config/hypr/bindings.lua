@@ -30,5 +30,18 @@ for ws = 1, 10 do
   bind("SUPER + SHIFT + " .. key, hl.dsp.window.move({ workspace = tostring(ws), follow = true }))
 end
 
+-- Media and brightness keys: work on the lock screen, repeat while held. swayosd shows the level.
+local held = { locked = true, repeating = true }
+bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("swayosd-client --output-volume raise"), held)
+bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("swayosd-client --output-volume lower"), held)
+bind("XF86AudioMute", hl.dsp.exec_cmd("swayosd-client --output-volume mute-toggle"), { locked = true })
+bind("XF86AudioMicMute", hl.dsp.exec_cmd("swayosd-client --input-volume mute-toggle"), { locked = true })
+bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("swayosd-client --brightness raise"), held)
+bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("swayosd-client --brightness lower"), held)
+bind("XF86AudioPlay", hl.dsp.exec_cmd("playerctl play-pause"), { locked = true })
+bind("XF86AudioPause", hl.dsp.exec_cmd("playerctl play-pause"), { locked = true })
+bind("XF86AudioNext", hl.dsp.exec_cmd("playerctl next"), { locked = true })
+bind("XF86AudioPrev", hl.dsp.exec_cmd("playerctl previous"), { locked = true })
+
 bind("SUPER + mouse:272", hl.dsp.window.drag(), { mouse = true })
 bind("SUPER + mouse:273", hl.dsp.window.resize(), { mouse = true })

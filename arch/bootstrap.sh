@@ -1,19 +1,34 @@
 #!/usr/bin/env bash
 # Workstation setup for a clean, bootable Arch install. Safe to rerun.
 # Never partitions disks, never overwrites existing config.
+# Usage: arch/bootstrap.sh [work] [private]   (shared apps always; profile remembered)
 set -euo pipefail
 
 repo=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 common=(zsh tmux nvim lazygit workmux mise)
 desktop=(hypr ghostty services swaylock screensaver waybar walker elephant tui screenshot notifications wallpaper theme)
-system_services=(NetworkManager.service bluetooth.service)
-user_services=(hyprpolkitagent.service hypridle.service elephant.service walker.service waybar.service dnd-on-screenshare.service crash-watch.service swaybg.service)
+system_services=(NetworkManager.service bluetooth.service cups.socket ufw.service power-profiles-daemon.service docker.socket plocate-updatedb.timer)
+user_services=(hyprpolkitagent.service hypridle.service elephant.service walker.service waybar.service dnd-on-screenshare.service crash-watch.service swaybg.service swayosd.service gnome-keyring-daemon.socket)
 
 die() { echo "bootstrap: $*" >&2; exit 1; }
 step() { echo "==> $*"; }
 
 [[ $EUID -ne 0 ]] || die "run as your user, not root"
 grep -qx 'ID=arch' /etc/os-release || die "not Arch Linux"
+
+# Which app lists this machine gets (besides shared). Arguments replace the remembered set.
+profile_file=$HOME/.config/dotfiles-profile
+if (($#)); then
+  for p in "$@"; do [[ $p == work || $p == private ]] || die "unknown profile '$p' (use work and/or private)"; done
+  mkdir -p "$(dirname "$profile_file")"
+  printf '%s\n' "$@" >"$profile_file"
+fi
+profiles=()
+[[ -f $profile_file ]] && mapfile -t profiles <"$profile_file"
+echo "bootstrap: app profiles: shared ${profiles[*]:-(no work/private; pass 'work' and/or 'private')}"
+if [[ " ${profiles[*]} " == *" private "* ]] && ! grep -q '^\[multilib\]' /etc/pacman.conf; then
+  die "the private apps need [multilib] (steam): uncomment it in /etc/pacman.conf, run 'sudo pacman -Sy', rerun"
+fi
 
 step "Official packages"
 grep -v -E '^\s*(#|$)' "$repo/arch/packages-repo.txt" | sudo pacman -S --needed --noconfirm -
@@ -27,6 +42,13 @@ if ! command -v yay >/dev/null; then
 fi
 mapfile -t aur < <(grep -v -E '^\s*(#|$)' "$repo/arch/packages-aur.txt")
 yay -S --needed --noconfirm --answerdiff None --answerclean None --removemake "${aur[@]}"
+
+step "Apps: shared ${profiles[*]}"
+apps=()
+for list in shared "${profiles[@]}"; do
+  mapfile -t -O "${#apps[@]}" apps < <(grep -v -E '^\s*(#|$)' "$repo/arch/apps-$list.txt")
+done
+yay -S --needed --noconfirm --answerdiff None --answerclean None --removemake "${apps[@]}"
 
 # Real dirs first, so stow links files inside them instead of folding whole dirs into the repo.
 mkdir -p "$HOME"/.config/{systemd/user,walker,elephant/menus,gtk-3.0,gtk-4.0,qt6ct} "$HOME"/.local/{bin,share,state} "$HOME"/.zsh
@@ -59,11 +81,33 @@ gsettings set org.gnome.desktop.interface cursor-size 24
 [[ -e $HOME/.config/qt6ct/qt6ct.conf ]] ||
   sed "s|@HOME@|$HOME|" "$repo/arch/etc/qt6ct/qt6ct.conf" >"$HOME/.config/qt6ct/qt6ct.conf"
 
+step "Firewall: deny incoming, allow LocalSend"
+sudo ufw default deny incoming >/dev/null
+sudo ufw default allow outgoing >/dev/null
+sudo ufw allow 53317/tcp comment LocalSend >/dev/null
+sudo ufw allow 53317/udp comment LocalSend >/dev/null
+# Keep SSH reachable where sshd is enabled (e.g. the test VM), rate-limited.
+if systemctl is-enabled --quiet sshd.service 2>/dev/null; then sudo ufw limit 22/tcp comment SSH >/dev/null; fi
+sudo ufw --force enable >/dev/null
+
 step "Services"
 sudo systemctl enable --now "${system_services[@]}"
+if ! id -nG "$USER" | grep -qw docker; then
+  sudo usermod -aG docker "$USER"
+  echo "bootstrap: added $USER to the docker group (takes effect at next login)"
+fi
 systemctl --user enable "${user_services[@]}"
 # On a rerun inside a session: elephant only loads providers at startup, so new ones need a restart.
 systemctl --user try-restart elephant.service walker.service 2>/dev/null || true
+
+step "Default apps"
+xdg-user-dirs-update
+mime() { local app=$1; shift; xdg-mime default "$app" "$@"; }
+mime org.gnome.Nautilus.desktop inode/directory
+mime org.gnome.Papers.desktop application/pdf
+mime imv.desktop image/png image/jpeg image/gif image/webp image/bmp image/tiff image/avif image/heic image/svg+xml
+mime mpv.desktop video/mp4 video/webm video/x-matroska video/quicktime video/x-msvideo video/mpeg video/ogg \
+  audio/mpeg audio/flac audio/ogg audio/wav audio/x-wav audio/mp4 audio/aac audio/opus
 
 step "Boot splash (Plymouth theme)"
 theme_src="$repo/arch/plymouth/gitznik" theme_dst=/usr/share/plymouth/themes/gitznik

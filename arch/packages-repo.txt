@@ -49,6 +49,25 @@ dconf
 qt6ct
 qt6-wayland
 
+# Desktop plumbing: keyring for app logins, media/brightness keys + OSD, printing,
+# firewall, power profiles, firmware updates, Nautilus extras
+gnome-keyring
+libsecret
+playerctl
+brightnessctl
+swayosd
+cups
+system-config-printer
+ufw
+power-profiles-daemon
+fwupd
+xdg-user-dirs
+gvfs-mtp
+sushi
+ffmpegthumbnailer
+libqalculate
+noto-fonts-cjk
+
 # Desktop apps
 ghostty
 nautilus
@@ -69,3 +88,11 @@ starship
 eza
 bat
 lazygit
+btop
+ripgrep
+fd
+unzip
+7zip
+man-db
+tldr
+plocate

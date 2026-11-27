@@ -1,0 +1,19 @@
+# Apps for every machine. Installed by bootstrap.sh with yay (official repos and AUR alike).
+chromium
+bitwarden
+bitwarden-cli
+obsidian
+libreoffice-fresh
+thunderbird
+localsend-bin
+mpv
+imv
+papers
+docker
+docker-compose
+docker-buildx
+lazydocker
+wireguard-tools
+rclone
+sshs
+opencode-desktop-bin

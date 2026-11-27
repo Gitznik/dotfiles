@@ -1,0 +1,9 @@
+# Private machines only: arch/bootstrap.sh private. steam needs [multilib] in pacman.conf.
+element-desktop
+discord
+steam
+bambustudio-bin
+orca-slicer-bin
+vial-appimage
+apps2samsung-bin
+nextcloud-client

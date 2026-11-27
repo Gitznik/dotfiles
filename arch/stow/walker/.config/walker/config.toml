@@ -1,6 +1,6 @@
 theme = "catppuccin-mocha"
 
-# Layered over walker's built-in defaults. "menus" makes the elephant menus (e.g. system) searchable from SUPER+D.
+# Layered over walker's built-in defaults. "menus" makes the elephant menus (e.g. system) searchable from SUPER+D; "calc" evaluates math (libqalculate).
 [providers]
-default = ["desktopapplications", "menus"]
+default = ["desktopapplications", "menus", "calc"]
 empty = ["desktopapplications"]

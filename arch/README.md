@@ -10,6 +10,7 @@ Decide these per machine. Don't script them:
 - [ ] LUKS full-disk encryption (required: auto-login relies on the disk passphrase), bootloader, kernel (`linux` + `linux-headers`), microcode (`amd-ucode`/`intel-ucode`)
 - [ ] Boot splash for the LUKS prompt: `plymouth` package installed, `plymouth` in mkinitcpio `HOOKS` after `base udev`/`systemd` and before `encrypt`/`sd-encrypt`, `quiet splash` on the kernel command line (bootloader-specific; with a UKI it's `/etc/kernel/cmdline`), then `mkinitcpio -P`. The bootstrap installs the theme and warns if the hook or `splash` is missing. A serial console on the command line (`console=ttyS0`/`uart`) makes Plymouth fall back to text
 - [ ] User in `wheel` with sudo
+- [ ] Private machines: `[multilib]` enabled in `/etc/pacman.conf` (Steam)
 - [ ] Packages: `base base-devel git networkmanager`, with `NetworkManager` enabled so the first boot has network
 - [ ] Boots to a TTY login
 
@@ -20,10 +21,14 @@ Keep Wi-Fi passwords, SSH/GPG keys and tokens out of this repo. SSH keys live in
 ```sh
 git clone https://github.com/Gitznik/dotfiles.git ~/dotfiles   # SSH keys aren't on the machine yet
 cd ~/dotfiles && git switch arch
-arch/bootstrap.sh
+arch/bootstrap.sh work            # or: private, or: work private
 ```
 
-**Real machines only (not the VM):** pull the SSH keys from Bitwarden into `~/.ssh` (`chmod 700 ~/.ssh`, `600` on private keys), then switch the remote: `git -C ~/dotfiles remote set-url origin git@github.com:Gitznik/dotfiles.git`. Use the Bitwarden desktop app or `bitwarden-cli` (official repo). **Open:** exact item names and storage type (SSH-key items or attachments), and whether to script this step.
+Apps come in three lists: `apps-shared.txt` (every machine), `apps-work.txt`, `apps-private.txt`. The profile you pass is remembered in `~/.config/dotfiles-profile`, so later reruns need no argument; passing profiles again replaces it.
+
+**Real machines only (not the VM):** SSH keys stay in Bitwarden and are never written to disk. Log into the Bitwarden desktop app, enable Settings > SSH agent, and keep the keys as SSH key items. The session points `SSH_AUTH_SOCK` at `~/.bitwarden-ssh-agent.sock` (hypr `env.lua`). Then switch the remote: `git -C ~/dotfiles remote set-url origin git@github.com:Gitznik/dotfiles.git`.
+
+**Keyring:** the first app that stores a login (Element, Chromium, Slack…) asks for a new keyring password. Leave it **empty**: auto-login never types a password, so a password-protected keyring would prompt on every boot, and the disk is already encrypted by LUKS.
 
 The bootstrap installs `packages-repo.txt` and `packages-aur.txt`, checks for conflicts with existing files, stows the shared and desktop packages, installs the greetd config, enables services and sets zsh as the login shell. If any file would be overwritten, it stops before changing anything. Rerunning it is safe.
 
@@ -92,6 +97,17 @@ The VM needs a virtio GPU with 3D/GL acceleration, or Hyprland won't start. `jus
 - [ ] `nautilus` and its file dialogs are dark (adw-gtk3-dark / libadwaita dark); `gsettings get org.gnome.desktop.interface color-scheme` is `'prefer-dark'`
 - [ ] `qt6ct` opens in the Catppuccin palette (mauve selection); Qt apps follow it
 - [ ] Same Adwaita cursor over windows, the bar and the desktop
+
+### Apps and desktop plumbing checks
+
+- [ ] `cat ~/.config/dotfiles-profile` shows the profile; apps from `apps-shared.txt` and that profile launch from `SUPER+D`
+- [ ] Volume keys show the Catppuccin OSD and repeat while held; mute, mic mute, play/pause/next work, also on the lock screen. Brightness keys on laptops
+- [ ] `SUPER+D` then `12*7`: the calculator result appears
+- [ ] Opening a PDF, image, video and folder uses Papers, imv, mpv, Nautilus (`xdg-open`)
+- [ ] `sudo ufw status`: active, deny incoming, 53317 allowed (and 22 limited where sshd is enabled); LocalSend sees another device (hardware)
+- [ ] `docker run --rm hello-world` works without sudo after re-login
+- [ ] Element/Chromium login survives a reboot (keyring with an empty password)
+- [ ] `ssh-add -l` lists the keys from Bitwarden's agent (real machines)
 
 ### Later milestones (from the inventory)
 

@@ -1,0 +1,4 @@
+# Work machines only: arch/bootstrap.sh work
+lazysql-bin
+yaak-bin
+timew

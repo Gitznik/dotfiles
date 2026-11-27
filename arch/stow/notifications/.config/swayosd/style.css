@@ -1,0 +1,32 @@
+/* Catppuccin Mocha volume/brightness OSD */
+window#osd {
+  border-radius: 8px;
+  border: 2px solid #cba6f7;
+  background: alpha(#1e1e2e, 0.95);
+}
+
+#container {
+  margin: 14px 18px;
+}
+
+image,
+label {
+  color: #cdd6f4;
+}
+
+progressbar:disabled,
+image:disabled {
+  opacity: 0.5;
+}
+
+progressbar trough {
+  min-height: 6px;
+  border-radius: 3px;
+  background: #313244;
+}
+
+progressbar progress {
+  min-height: 6px;
+  border-radius: 3px;
+  background: #cba6f7;
+}
