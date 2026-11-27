@@ -1,0 +1,42 @@
+# Managed by arch/bootstrap.sh (installed to /etc/tuigreet/config.toml).
+# Named colors map to the console palette, which etc/vtrgb sets to Catppuccin Mocha:
+# black=base, magenta=mauve, blue=blue, white=text, bright-black=surface2.
+
+[display]
+show_time = true
+time_format = "%a %d %b  %H:%M"
+show_title = false
+issue = false
+align_greeting = "center"
+
+[layout]
+width = 56
+window_padding = 0
+container_padding = 2
+prompt_padding = 1
+
+[layout.widgets]
+time_position = "top"
+status_position = "bottom"
+
+[remember]
+username = true
+
+[secret]
+mode = "characters"
+characters = "*"
+
+[background]
+kind = "none"
+
+[theme]
+container = "black"
+border = "magenta"
+title = "magenta"
+text = "white"
+time = "blue"
+greet = "magenta"
+prompt = "blue"
+input = "white"
+action = "bright-black"
+button = "magenta"
