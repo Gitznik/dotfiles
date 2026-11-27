@@ -27,6 +27,6 @@ hl.config({
 hl.window_rule({ match = { fullscreen = true }, border_size = 0 })
 
 -- Bar popups (tui-launch): bluetui, nmtui, wiremix.
-hl.window_rule({ match = { class = "^local\\.tui\\." }, float = true, center = true, size = { 900, 600 } })
+hl.window_rule({ match = { class = "local\\.tui\\..+" }, float = true, center = true, size = { 900, 600 } })
 
 hl.window_rule({ match = { class = "local.screensaver" }, workspace = "special:screensaver", fullscreen = true })
