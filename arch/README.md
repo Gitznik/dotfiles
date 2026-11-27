@@ -147,14 +147,9 @@ The VM needs a virtio GPU with 3D/GL acceleration, or Hyprland won't start. `jus
 
 **Each machine, once:**
 
-```sh
-read -rsp 'restic user password: ' PW; echo
-rclone config create robonas smb host=<NAS IP> user=restic pass="$PW"   # rclone obscures it
-rclone lsd robonas:backup                                              # check: lists the folder
-backup init      # backend rclone, remote robonas, path backup/restic/<host>
-```
+`backup init`: backend `rclone`, remote `robonas`. If the remote doesn't exist yet, it creates it (SMB: NAS host, user `restic`, password; rclone stores it obscured in `~/.config/rclone/rclone.conf`, keep it in Bitwarden too) and checks the connection. Path: `backup/restic/<host>`.
 
-`backup init` stores the target only in `~/.config/backup/target.env` (never in this public repo), generates the repository password (keep the printed copy in **Bitwarden**: without it no restore on another machine) and stores it in the keyring, creates the repository and enables the timer. Then `backup run` (or the bar icon, or `just backup`). The NAS password lives in `~/.config/rclone/rclone.conf` like other remotes; keep it in Bitwarden too. Plain SFTP with a dedicated key is still supported (`backend: sftp`), but needs the key installed on the NAS over admin SSH.
+It stores the target only in `~/.config/backup/target.env` (never in this public repo), generates the repository password (keep the printed copy in **Bitwarden**: without it no restore on another machine) and stores it in the keyring, creates the repository and enables the timer. Then `backup run` (or the bar icon, or `just backup`). Plain SFTP with a dedicated key is still supported (`backend: sftp`), but needs the key installed on the NAS over admin SSH.
 
 **Restore:** `backup restic snapshots`, `backup restic mount ~/mnt` (browse), `backup restic restore latest --target ~/restore --include ~/Documents`. On a new machine: same rclone remote, then `backup init` with the same path and the Bitwarden password.
 

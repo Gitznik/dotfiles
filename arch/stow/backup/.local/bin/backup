@@ -54,10 +54,21 @@ cmd_init() {
     local backend host user path port remote
     read -rp "Backend: rclone remote or plain sftp [rclone]: " backend
     if [[ ${backend:-rclone} == rclone ]]; then
-      echo "rclone remotes: $(rclone listremotes | tr '\n' ' ')"
-      read -rp "Remote for the backups (create one first with 'rclone config'): " remote
-      remote=${remote%:}
-      rclone listremotes | grep -qx "$remote:" || die "no rclone remote '$remote' (see arch/README.md 'Backups')"
+      echo "rclone remotes: $(rclone listremotes 2>/dev/null | tr '\n' ' ')"
+      read -rp "Remote for the backups [robonas]: " remote
+      remote=${remote:-robonas}; remote=${remote%:}
+      if ! rclone listremotes 2>/dev/null | grep -qx "$remote:"; then
+        echo "No remote '$remote' yet: creating it as SMB to the NAS (password stored obscured in rclone.conf)."
+        local smb_host smb_user smb_pw
+        read -rp "NAS host (IP or name): " smb_host
+        read -rp "NAS user [restic]: " smb_user
+        read -rsp "Password for that user: " smb_pw; echo
+        rclone config create "$remote" smb host="$smb_host" user="${smb_user:-restic}" pass="$smb_pw" >/dev/null
+        unset smb_pw
+        rclone lsd "$remote:" >/dev/null 2>&1 ||
+          { rclone config delete "$remote"; die "can't connect to $smb_host as ${smb_user:-restic} over SMB (SMB on? user/password right?)"; }
+        echo "Remote '$remote' works."
+      fi
       read -rp "Path on the remote [backup/restic/${HOSTNAME:-$(uname -n)}]: " path
       path=${path:-backup/restic/${HOSTNAME:-$(uname -n)}}
       printf 'BACKUP_REPO="rclone:%s:%s"\n' "$remote" "$path" >"$target"
