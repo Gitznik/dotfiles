@@ -5,7 +5,9 @@
         "removable": false,
         "uki": false
     },
-    "custom_commands": [],
+    "custom_commands": [
+        "systemctl enable sshd"
+    ],
     "disk_config": {
         "btrfs_options": {
             "snapshot_config": null

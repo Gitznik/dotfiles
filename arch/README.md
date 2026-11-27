@@ -14,7 +14,7 @@ Boot the Arch ISO and run `archinstall`. Pick these, leave everything else at th
 - **User:** your user, with sudo (superuser)
 - **Private machines:** enable the `multilib` repository (Steam)
 
-Nothing to edit by hand afterwards: the bootstrap adds the boot splash (Plymouth hook, `quiet splash`) and the snapshot boot entries. The test VM does all of this from a config file: `archinstall --config user_configuration.json` (from `arch/vm/`), which also adds `openssh` + `sshd`; only the passwords are asked.
+Nothing to edit by hand afterwards: the bootstrap adds the boot splash (Plymouth hook, `quiet splash`) and the snapshot boot entries. The test VM does all of this from a config file: `archinstall --config user_configuration.json` (from `arch/vm/`), which also adds `openssh` + `sshd`. **Passwords aren't in the file:** in archinstall's menu set the user (Authentication) **and** the disk encryption password (Disk configuration > Disk encryption) before Install. Without the encryption password archinstall silently installs unencrypted; the bootstrap refuses to run on an unencrypted root.
 
 **Framework laptops** (the plan for all machines): update the BIOS first (`fwupdmgr update`, or Framework's USB updater). Set the battery charge limit (e.g. 80%) in the BIOS or with `framework_tool --charge-limit 80` (the bootstrap installs `framework-system` on Framework hardware): useful when the laptop lives docked. The Framework 16 keyboard/input modules get a udev rule for VIA/`qmk_hid`. Intel models get `thermald`, media drivers and `sof-firmware`; AMD models the Radeon Vulkan driver.
 

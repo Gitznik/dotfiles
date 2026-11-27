@@ -25,6 +25,13 @@ install_managed() {
 
 [[ $EUID -ne 0 ]] || die "run as your user, not root"
 grep -qx 'ID=arch' /etc/os-release || die "not Arch Linux"
+# Auto-login is only acceptable because the disk passphrase guards the machine.
+root_src=$(findmnt -no SOURCE / | sed 's/\[.*//')
+if ! lsblk -no TYPE "$root_src" 2>/dev/null | grep -qx crypt && [[ ${BOOTSTRAP_ALLOW_UNENCRYPTED:-0} != 1 ]]; then
+  die "/ isn't on an encrypted (LUKS) device: with auto-login anyone at the machine would be logged in.
+  Reinstall with disk encryption (archinstall: Disk encryption > LUKS + password).
+  Test setups only: BOOTSTRAP_ALLOW_UNENCRYPTED=1 arch/bootstrap.sh"
+fi
 
 # Which app lists this machine gets (besides shared). Arguments replace the remembered set.
 profile_file=$HOME/.config/dotfiles-profile
