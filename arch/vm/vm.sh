@@ -21,6 +21,7 @@ latest_iso() {
   echo "$iso"
 }
 
+# -serial none: with a serial port, console=uart… lands on the guest cmdline and Plymouth forces text mode.
 qemu() {
   local disk=$1 vars=$2; shift 2
   exec qemu-system-x86_64 \
@@ -34,6 +35,7 @@ qemu() {
     -device qemu-xhci -device usb-tablet \
     -audiodev pipewire,id=snd -device intel-hda -device hda-duplex,audiodev=snd \
     -device virtio-rng-pci \
+    -serial none \
     "$@"
 }
 
