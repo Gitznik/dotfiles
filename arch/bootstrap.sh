@@ -170,10 +170,14 @@ if [[ $(findmnt -no FSTYPE /) == btrfs ]]; then
       [[ " $cmdline " == *" splash "* ]] || cmdline+=" quiet splash"
       printf '%s\n' "# Managed by arch/bootstrap.sh: limine-entry-tool config, from /proc/cmdline at first run." \
         "ESP_PATH=\"$esp\"" "KERNEL_CMDLINE[default]=\"$cmdline\"" "ENABLE_UKI=no" \
-        "ENABLE_LIMINE_FALLBACK=yes" "FIND_BOOTLOADERS=yes" "MAX_SNAPSHOT_ENTRIES=5" |
+        "ENABLE_LIMINE_FALLBACK=yes" "FIND_BOOTLOADERS=yes" "MAX_SNAPSHOT_ENTRIES=5" \
+        "SNAPSHOT_FORMAT_CHOICE=8" |
         sudo install -Dm644 /dev/stdin /etc/default/limine
     fi
     # inotify-tools: limine-snapper-sync watches the snapshot list (else it falls back to a snapper plugin).
+    # Boot menu label: date + snapshot description (e.g. "before cowsay"); also for older configs.
+    grep -q '^SNAPSHOT_FORMAT_CHOICE=' /etc/default/limine ||
+      echo 'SNAPSHOT_FORMAT_CHOICE=8' | sudo tee -a /etc/default/limine >/dev/null
     yay -S --needed --noconfirm --answerdiff None --answerclean None inotify-tools limine-mkinitcpio-hook limine-snapper-sync
     # Snapshots are read-only: this hook boots them with a temporary writable overlay.
     if ! grep -qE '^\s*HOOKS=.*btrfs-overlayfs' /etc/mkinitcpio.conf; then
