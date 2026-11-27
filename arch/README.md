@@ -33,7 +33,7 @@ Reboot. After the LUKS passphrase, greetd logs you straight into Hyprland (via u
 
 ## 3. VM test loop
 
-The VM needs a virtio GPU with 3D/GL acceleration, or Hyprland won't start. `just vm …` (`arch/vm/vm.sh`, needs `qemu-desktop edk2-ovmf`) provides this. Images live in `~/vms` (on btrfs: `chattr +C ~/vms` before creating them). On a Hyprland host, press `Ctrl+Alt+G` in the VM window before using `SUPER` bindings, or the host takes them.
+The VM needs a virtio GPU with 3D/GL acceleration, or Hyprland won't start. `just vm …` (`arch/vm/vm.sh`, needs `qemu-desktop edk2-ovmf`) provides this. Images live in `~/vms` (on btrfs: `chattr +C ~/vms` before creating them). The VM window grabs the keyboard while the pointer is over it (`grab-on-hover`), so `SUPER` bindings go to the guest. Don't press `Ctrl+Alt+G`: a full grab locks the pointer and the absolute USB tablet stops moving until you press it again.
 
 1. Install base Arch (step 1) with `just vm iso` then `just vm create`, then snapshot it as **clean-base** with `just vm seal`. Restore it with `just vm reset`; boot with `just vm run`.
 2. Run step 2 from the branch.

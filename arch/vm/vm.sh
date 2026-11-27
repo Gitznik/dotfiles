@@ -31,7 +31,7 @@ qemu() {
     -drive if=pflash,format=raw,file="$vars" \
     -drive file="$disk",format=qcow2,if=virtio,discard=unmap \
     -nic user,model=virtio-net-pci,hostfwd=tcp:127.0.0.1:2222-:22 \
-    -device virtio-vga-gl -display gtk,gl=on \
+    -device virtio-vga-gl -display gtk,gl=on,grab-on-hover=on \
     -device qemu-xhci -device usb-tablet \
     -audiodev pipewire,id=snd -device intel-hda -device hda-duplex,audiodev=snd \
     -device virtio-rng-pci \
@@ -98,7 +98,7 @@ usage: vm.sh iso|create|install|seal|reset|run|ssh-key|ssh
   run      boot the work overlay
   ssh-key  create ~/vms/id_vm and install it in the guest (asks for the guest password once)
   ssh      ssh into the running guest, optionally running a command
-Env: VM_DIR VM_CPUS VM_MEM VM_DISK VM_USER. Guest SSH: localhost:2222 (needs openssh + sshd in the guest). Release grab: Ctrl+Alt+G.
+Env: VM_DIR VM_CPUS VM_MEM VM_DISK VM_USER. Guest SSH: localhost:2222 (needs openssh + sshd in the guest). Keyboard grabs on hover; avoid Ctrl+Alt+G (locks the pointer).
 EOF
     exit 1
     ;;
