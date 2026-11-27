@@ -110,7 +110,7 @@ cmd_run() {
 age_days() { echo $(( ($(date +%s) - $(date -r "$1" +%s)) / 86400 )); }
 
 cmd_status() {
-  local icon=$'\U000F0160' text="" tooltip="" class=""   # nf-md-backup_restore
+  local icon="󰅠" text="" tooltip="" class=""   # nf-md-backup_restore
   if [[ ! -f $target ]]; then
     text=$icon class=unset tooltip="Backups not set up: run backup init"
   elif [[ -f $state/last-failure ]]; then
