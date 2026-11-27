@@ -144,7 +144,21 @@ if [[ $(findmnt -no FSTYPE /) == btrfs ]]; then
   sudo systemctl enable --now snapper-cleanup.timer
   if pacman -Q limine >/dev/null 2>&1; then
     # Boot menu entries for snapshots, so a bad update can be rolled back from the boot menu.
-    yay -S --needed --noconfirm --answerdiff None --answerclean None limine-snapper-sync
+    # limine-entry-tool (limine-mkinitcpio-hook) writes the kernel entries from /etc/default/limine
+    # on every initramfs build; limine-snapper-sync adds the snapshot entries next to them.
+    if [[ ! -f /etc/default/limine ]]; then
+      esp=""
+      for d in /boot /efi /boot/efi; do [[ $(findmnt -no FSTYPE "$d" 2>/dev/null) == vfat ]] && { esp=$d; break; }; done
+      [[ -n $esp ]] || die "Limine: no vfat ESP at /boot, /efi or /boot/efi"
+      # The command line this machine booted with (LUKS device, root subvolume, quiet splash).
+      cmdline=$(tr ' ' '\n' </proc/cmdline | grep -vE '^(BOOT_IMAGE|initrd)=' | paste -sd' ')
+      printf '%s\n' "# Managed by arch/bootstrap.sh: limine-entry-tool config, from /proc/cmdline at first run." \
+        "ESP_PATH=\"$esp\"" "KERNEL_CMDLINE[default]=\"$cmdline\"" "ENABLE_UKI=no" \
+        "ENABLE_LIMINE_FALLBACK=yes" "FIND_BOOTLOADERS=yes" "MAX_SNAPSHOT_ENTRIES=5" |
+        sudo install -Dm644 /dev/stdin /etc/default/limine
+    fi
+    yay -S --needed --noconfirm --answerdiff None --answerclean None limine-mkinitcpio-hook limine-snapper-sync
+    sudo limine-update
     sudo systemctl enable --now limine-snapper-sync.service
   else
     echo "bootstrap: snapshots are taken, but booting into one needs Limine (see README step 1)" >&2

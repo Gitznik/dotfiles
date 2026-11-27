@@ -1,9 +1,9 @@
 {
     "archinstall_language": "English",
     "bootloader_config": {
-        "bootloader": "Systemd-boot",
+        "bootloader": "Limine",
         "removable": false,
-        "uki": true
+        "uki": false
     },
     "custom_commands": [],
     "disk_config": {
