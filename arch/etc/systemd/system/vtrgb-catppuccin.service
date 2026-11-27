@@ -1,0 +1,13 @@
+# Managed by arch/bootstrap.sh (installed to /etc/systemd/system/).
+[Unit]
+Description=Catppuccin Mocha palette for the Linux console (tuigreet, TTYs)
+After=systemd-vconsole-setup.service plymouth-quit-wait.service
+Before=greetd.service getty@tty1.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/setvtrgb /etc/vtrgb-catppuccin
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

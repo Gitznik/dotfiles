@@ -81,6 +81,25 @@ fi
 # Enable only: starting greetd now would take over tty1 mid-bootstrap. Active after reboot.
 sudo systemctl enable greetd.service
 
+step "Login screen: tuigreet theme, Catppuccin console palette"
+# Installs a repo file into /etc. Replaces only files this script wrote (marker line), so
+# hand edits stop the run instead of being overwritten.
+install_managed() {
+  local src=$1 dst=$2
+  cmp -s "$src" "$dst" && return 0
+  if [[ -e $dst ]] && ! grep -q 'Managed by arch/bootstrap.sh' "$dst"; then
+    die "$dst exists and wasn't written by this script; merge $src by hand"
+  fi
+  sudo install -Dm644 "$src" "$dst"
+}
+install_managed "$repo/arch/etc/tuigreet/config.toml" /etc/tuigreet/config.toml
+install_managed "$repo/arch/etc/systemd/system/vtrgb-catppuccin.service" /etc/systemd/system/vtrgb-catppuccin.service
+# Own filename and no room for a marker in the palette format, so always kept in sync.
+cmp -s "$repo/arch/etc/vtrgb-catppuccin" /etc/vtrgb-catppuccin ||
+  sudo install -m644 "$repo/arch/etc/vtrgb-catppuccin" /etc/vtrgb-catppuccin
+sudo systemctl daemon-reload
+sudo systemctl enable --now vtrgb-catppuccin.service
+
 if [[ $(getent passwd "$USER" | cut -d: -f7) != /usr/bin/zsh ]]; then
   step "Login shell -> zsh"
   chsh -s /usr/bin/zsh
