@@ -83,7 +83,7 @@ The VM needs a virtio GPU with 3D/GL acceleration, or Hyprland won't start. `jus
 - [ ] `notify-send test hello` shows a Catppuccin toast top right, below the bar; clicking dismisses it; `notify-send -u critical x y` stays until clicked (peach border)
 - [ ] Bell in the bar: click toggles do not disturb (bell turns peach and crossed out); while on, `notify-send` shows nothing; `makoctl restore` brings back the last one after turning it off
 - [ ] Screen share (hardware, or VM if the portal works): start a portal screen share, e.g. in the browser; DND turns on by itself within ~2s, and turns off when the share stops. If DND was already on before sharing, it stays on afterwards
-- [ ] `sleep 300 & kill -SEGV $!`: a critical "sleep crashed" toast appears; **Details** opens `coredumpctl info` in Ghostty. A second crash of the same program within 60s is not announced
+- [ ] `sleep 300 & kill -SEGV $!`: a critical "sleep crashed" toast appears; clicking it opens `coredumpctl info` in Ghostty. A second crash of the same program within 60s is not announced
 - [ ] `systemctl --user status dnd-on-screenshare crash-watch` both running
 - [ ] Coffee cup in the bar: click turns on stay awake (cup fills, peach); `journalctl --user -u hypridle` logs "systemd idle inhibit active" and no screensaver/lock/display-off happens past 330s; click again turns it off and idle works as before. `systemctl suspend` still locks first while it's on
 
