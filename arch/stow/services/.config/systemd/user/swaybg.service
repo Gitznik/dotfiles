@@ -1,0 +1,11 @@
+[Unit]
+Description=Desktop wallpaper
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+ExecStart=/usr/bin/swaybg --mode fill --color 181825 --image %h/.local/share/wallpapers/topo.png
+Restart=on-failure
+
+[Install]
+WantedBy=graphical-session.target

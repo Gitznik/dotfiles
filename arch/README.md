@@ -1,6 +1,6 @@
 # Arch workstation
 
-Plain Arch + Hyprland, no Omarchy. Shared dotfiles (`zsh tmux nvim lazygit workmux`) live at the repo root. The Arch-only desktop lives in `arch/stow/` (`hypr ghostty services swaylock screensaver waybar walker elephant tui screenshot notifications`), plus `arch/etc/` for system files. The Omarchy machine keeps using `just stow-all` on `main` and never stows `arch/stow/`.
+Plain Arch + Hyprland, no Omarchy. Shared dotfiles (`zsh tmux nvim lazygit workmux`) live at the repo root. The Arch-only desktop lives in `arch/stow/` (`hypr ghostty services swaylock screensaver waybar walker elephant tui screenshot notifications wallpaper`), plus `arch/etc/` for system files. The Omarchy machine keeps using `just stow-all` on `main` and never stows `arch/stow/`.
 
 ## 1. Base install (per machine, by hand or `archinstall`)
 
@@ -45,7 +45,7 @@ The VM needs a virtio GPU with 3D/GL acceleration, or Hyprland won't start. `jus
 ### Milestone 1 checks
 
 - [ ] LUKS prompt shows the Gitznik Plymouth theme (Catppuccin Mocha, lock icon, password box); a wrong passphrase re-prompts
-- [ ] Boot: LUKS passphrase, then straight into Hyprland (no second password). Catppuccin borders, no Hyprland logo or splash
+- [ ] Boot: LUKS passphrase, then straight into Hyprland (no second password). Contour-line wallpaper, Catppuccin borders, no Hyprland logo or splash
 - [ ] Log out: tuigreet appears, and logging back in works
 - [ ] `SUPER+RETURN` opens Ghostty (Catppuccin Mocha) with zsh, prompt and plugins and no startup errors; `tmux` starts
 - [ ] `SUPER+D` opens walker and launches apps; `systemctl --user status elephant walker` shows both running
@@ -55,7 +55,7 @@ The VM needs a virtio GPU with 3D/GL acceleration, or Hyprland won't start. `jus
 - [ ] `hyprctl configerrors` is empty
 - [ ] Idle: screensaver at 150s (fullscreen ttfx text effects on black, own special workspace, tiled layout untouched); a key press or mouse move closes it and restores the cursor
   - **Open (2026-11-27):** fails in the VM (Hyprland 0.57.2): every new window resets idle, so the screensaver window triggers hypridle's resume, which kills it, and the 300s lock is never reached. Plain windows reproduce it; hiding the cursor doesn't. Unknown whether it's Hyprland or QEMU's absolute tablet. Verify on hardware first
-- [ ] Lock: `SUPER+CTRL+L` locks (Catppuccin swaylock); idle locks at 300s over the screensaver, display turns off at 330s, a key press wakes it to the lock screen
+- [ ] Lock: `SUPER+CTRL+L` locks (Catppuccin swaylock over the blurred wallpaper, ring always visible); idle locks at 300s over the screensaver, display turns off at 330s, a key press wakes it to the lock screen
 - [ ] Suspend (`systemctl suspend`) locks first; on resume the lock screen shows, never the unlocked desktop
 - [ ] Locker robustness (hardware first; hyprlock crashed here when the display turned off while locked, see hyprwm/hyprlock#953): lock, then 10× `hyprctl dispatch 'hl.dsp.dpms({ action = "disable" })'` / `enable` from another TTY: swaylock survives. Then `pkill -9 swaylock`: the session **stays locked** (Hyprland's "lockscreen died" screen), and `swaylock` started from a TTY with `WAYLAND_DISPLAY` set takes over and unlocks normally
 
@@ -96,3 +96,4 @@ The VM needs a virtio GPU with 3D/GL acceleration, or Hyprland won't start. `jus
 - **Plymouth theme** (`arch/plymouth/gitznik`): adapted from Omarchy 4.5.0's theme (MIT, `LICENSE` alongside). To change the logo text, re-render `logo.png`:
   `magick -background none -fill '#cba6f7' +antialias -font JetBrainsMono-NF-Bold -pointsize 13 label:Gitznik -trim +repage -filter point -resize 1300% logo.png`
   (pixel style; for smooth letters, drop `+antialias … -resize 1300%` and use `-pointsize 170`). Then rerun the bootstrap.
+- **Wallpaper** (`arch/stow/wallpaper`): generated, not downloaded. `arch/wallpaper/render.sh` (ImageMagick 7) renders the contour-line image and the blurred lock-screen copy at 5120x2880; `SEED=<n> arch/wallpaper/render.sh` gives different terrain.

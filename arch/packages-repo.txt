@@ -38,6 +38,9 @@ grim
 slurp
 satty
 
+# Wallpaper
+swaybg
+
 # Desktop apps
 ghostty
 nautilus
