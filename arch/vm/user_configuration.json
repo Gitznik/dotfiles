@@ -119,7 +119,8 @@
     },
     "ntp": true,
     "packages": [
-        "git"
+        "git",
+        "openssh"
     ],
     "pacman_config": {
         "color": true,
@@ -135,7 +136,9 @@
         }
     },
     "script": null,
-    "services": [],
+    "services": [
+        "sshd"
+    ],
     "swap": {
         "algorithm": "zstd",
         "enabled": true

@@ -2,18 +2,19 @@
 
 Plain Arch + Hyprland, no Omarchy. Shared dotfiles (`zsh tmux nvim lazygit workmux`) live at the repo root. The Arch-only desktop lives in `arch/stow/` (`hypr ghostty services swaylock screensaver waybar walker elephant tui screenshot notifications wallpaper theme`), plus `arch/etc/` for system files (greetd, tuigreet theme, Catppuccin console palette). The Omarchy machine keeps using `just stow-all` on `main` and never stows `arch/stow/`.
 
-## 1. Base install (per machine, by hand or `archinstall`)
+## 1. Base install (archinstall)
 
-Decide these per machine. Don't script them:
+Boot the Arch ISO and run `archinstall`. Pick these, leave everything else at the default:
 
-- [ ] Target disk confirmed (`lsblk`). Don't use the daily driver's disk.
-- [ ] LUKS full-disk encryption (required: auto-login relies on the disk passphrase), kernel (`linux` + `linux-headers`), microcode (`amd-ucode`/`intel-ucode`)
-- [ ] btrfs root with archinstall's default subvolumes, **Limine** as bootloader (snapshot boot entries via `limine-snapper-sync`; with systemd-boot or GRUB the bootstrap still takes snapshots, but rolling back needs a live USB), zram swap (archinstall's swap option)
-- [ ] Boot splash for the LUKS prompt: `plymouth` package installed, `plymouth` in mkinitcpio `HOOKS` after `base udev`/`systemd` and before `encrypt`/`sd-encrypt`, `quiet splash` on the kernel command line (bootloader-specific; with a UKI it's `/etc/kernel/cmdline`), then `mkinitcpio -P`. The bootstrap installs the theme and warns if the hook or `splash` is missing. A serial console on the command line (`console=ttyS0`/`uart`) makes Plymouth fall back to text
-- [ ] User in `wheel` with sudo
-- [ ] Private machines: `[multilib]` enabled in `/etc/pacman.conf` (Steam)
-- [ ] Packages: `base base-devel git networkmanager`, with `NetworkManager` enabled so the first boot has network
-- [ ] Boots to a TTY login
+- **Disk:** the target disk (check with `lsblk`; never the daily driver's), **btrfs** with the default subvolumes, **encryption on** (LUKS; auto-login relies on the disk passphrase)
+- **Bootloader:** **Limine**, UKI off (snapshots then show up in the boot menu)
+- **Swap:** zram on
+- **Network:** NetworkManager
+- **Profile:** Minimal. **Additional packages:** `git`
+- **User:** your user, with sudo (superuser)
+- **Private machines:** enable the `multilib` repository (Steam)
+
+Nothing to edit by hand afterwards: the bootstrap adds the boot splash (Plymouth hook, `quiet splash`) and the snapshot boot entries. The test VM does all of this from a config file: `archinstall --config user_configuration.json` (from `arch/vm/`), which also adds `openssh` + `sshd`; only the passwords are asked.
 
 **Framework laptops** (the plan for all machines): update the BIOS first (`fwupdmgr update`, or Framework's USB updater). Set the battery charge limit (e.g. 80%) in the BIOS or with `framework_tool --charge-limit 80` (the bootstrap installs `framework-system` on Framework hardware): useful when the laptop lives docked. The Framework 16 keyboard/input modules get a udev rule for VIA/`qmk_hid`. Intel models get `thermald`, media drivers and `sof-firmware`; AMD models the Radeon Vulkan driver.
 

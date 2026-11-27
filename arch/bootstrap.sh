@@ -152,6 +152,8 @@ if [[ $(findmnt -no FSTYPE /) == btrfs ]]; then
       [[ -n $esp ]] || die "Limine: no vfat ESP at /boot, /efi or /boot/efi"
       # The command line this machine booted with (LUKS device, root subvolume, quiet splash).
       cmdline=$(tr ' ' '\n' </proc/cmdline | grep -vE '^(BOOT_IMAGE|initrd)=' | paste -sd' ')
+      # Boot splash (Plymouth) needs quiet splash on the kernel command line.
+      [[ " $cmdline " == *" splash "* ]] || cmdline+=" quiet splash"
       printf '%s\n' "# Managed by arch/bootstrap.sh: limine-entry-tool config, from /proc/cmdline at first run." \
         "ESP_PATH=\"$esp\"" "KERNEL_CMDLINE[default]=\"$cmdline\"" "ENABLE_UKI=no" \
         "ENABLE_LIMINE_FALLBACK=yes" "FIND_BOOTLOADERS=yes" "MAX_SNAPSHOT_ENTRIES=5" |
@@ -216,6 +218,11 @@ mime mpv.desktop video/mp4 video/webm video/x-matroska video/quicktime video/x-m
   audio/mpeg audio/flac audio/ogg audio/wav audio/x-wav audio/mp4 audio/aac audio/opus
 
 step "Boot splash (Plymouth theme)"
+# plymouth hook right after base udev/systemd (before the LUKS hook), as Omarchy and the Arch wiki do.
+if ! grep -qE '^\s*HOOKS(\+)?=.*\bplymouth\b' /etc/mkinitcpio.conf; then
+  sudo sed -i -E '/^\s*HOOKS=/ s/\bbase (udev|systemd)\b/base \1 plymouth/' /etc/mkinitcpio.conf
+  theme_changed=1   # rebuild the initramfs below
+fi
 theme_src="$repo/arch/plymouth/gitznik" theme_dst=/usr/share/plymouth/themes/gitznik
 if ! diff -rq "$theme_src" "$theme_dst" >/dev/null 2>&1; then
   sudo rm -rf "$theme_dst"
@@ -229,8 +236,8 @@ fi
 hooks=$(grep -hsE '^\s*HOOKS(\+)?=' /etc/mkinitcpio.conf /etc/mkinitcpio.conf.d/*.conf || true)
 grep -qw plymouth <<<"$hooks" ||
   echo "bootstrap: WARNING: no plymouth hook in mkinitcpio HOOKS, so the theme won't show (see README step 1)" >&2
-grep -qw splash /proc/cmdline ||
-  echo "bootstrap: WARNING: 'splash' missing from kernel cmdline, so the theme won't show (see README step 1)" >&2
+grep -qw splash /proc/cmdline || grep -qsw splash /etc/default/limine ||
+  echo "bootstrap: WARNING: 'splash' missing from the kernel command line, so the theme won't show (non-Limine bootloader: add 'quiet splash' there)" >&2
 
 step "Login: greetd auto-login"
 greetd_conf=$(sed "s/@USER@/$USER/" "$repo/arch/etc/greetd/config.toml")
