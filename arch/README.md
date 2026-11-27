@@ -54,6 +54,7 @@ The VM needs a virtio GPU with 3D/GL acceleration, or Hyprland won't start. `jus
 - [ ] `SUPER+SHIFT+ESCAPE` leaves the session cleanly
 - [ ] `hyprctl configerrors` is empty
 - [ ] Idle: screensaver at 150s (fullscreen ttfx text effects on black, own special workspace, tiled layout untouched); a key press or mouse move closes it and restores the cursor
+  - **Open (2026-11-27):** fails in the VM (Hyprland 0.57.2): every new window resets idle, so the screensaver window triggers hypridle's resume, which kills it, and the 300s lock is never reached. Plain windows reproduce it; hiding the cursor doesn't. Unknown whether it's Hyprland or QEMU's absolute tablet. Verify on hardware first
 - [ ] Lock: `SUPER+CTRL+L` locks (Catppuccin swaylock); idle locks at 300s over the screensaver, display turns off at 330s, a key press wakes it to the lock screen
 - [ ] Suspend (`systemctl suspend`) locks first; on resume the lock screen shows, never the unlocked desktop
 - [ ] Locker robustness (hardware first; hyprlock crashed here when the display turned off while locked, see hyprwm/hyprlock#953): lock, then 10× `hyprctl dispatch 'hl.dsp.dpms({ action = "disable" })'` / `enable` from another TTY: swaylock survives. Then `pkill -9 swaylock`: the session **stays locked** (Hyprland's "lockscreen died" screen), and `swaylock` started from a TTY with `WAYLAND_DISPLAY` set takes over and unlocks normally
