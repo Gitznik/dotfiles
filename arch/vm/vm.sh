@@ -10,7 +10,7 @@ ovmf_code=/usr/share/edk2/x64/OVMF_CODE.4m.fd
 ovmf_vars=/usr/share/edk2/x64/OVMF_VARS.4m.fd
 key=$HOME/vms/id_vm
 # Guest host keys change on every reset; never record them.
-ssh_opts=(-p 2222 -i "$key" -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR)
+ssh_opts=(-p 2222 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR)
 
 die() { echo "vm: $*" >&2; exit 1; }
 
@@ -78,7 +78,7 @@ case ${1:-} in
     ;;
   ssh)
     shift
-    exec ssh "${ssh_opts[@]}" "${VM_USER:-$USER}@localhost" "$@"
+    exec ssh -i "$key" -o IdentitiesOnly=yes "${ssh_opts[@]}" "${VM_USER:-$USER}@localhost" "$@"
     ;;
   run)
     [[ -f $dir/work.qcow2 ]] || die "no overlay; run: vm.sh seal (or reset)"
