@@ -7,7 +7,7 @@
   "reload_style_on_change": true,
   "modules-left": ["hyprland/workspaces"],
   "modules-center": ["clock"],
-  "modules-right": ["tray", "bluetooth", "network", "wireplumber", "battery", "custom/system"],
+  "modules-right": ["tray", "custom/dnd", "bluetooth", "network", "wireplumber", "battery", "custom/system"],
 
   "hyprland/workspaces": {
     "on-click": "activate",
@@ -59,6 +59,13 @@
     "format-full": "󰁹",
     "format-icons": ["󰁺", "󰁼", "󰁾", "󰂀", "󰂂"],
     "states": { "warning": 20, "critical": 10 }
+  },
+  "custom/dnd": {
+    "exec": "$HOME/.local/bin/dnd status",
+    "return-type": "json",
+    "interval": 30,
+    "signal": 8,
+    "on-click": "$HOME/.local/bin/dnd toggle"
   },
   "custom/system": {
     "format": "󰐥",

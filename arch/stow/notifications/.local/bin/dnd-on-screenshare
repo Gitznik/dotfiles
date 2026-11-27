@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# Turn on DND while any portal screencast is active; restore afterwards.
+# Ported from the Omarchy-era ~/.local/bin/dnd-on-screenshare (omarchy-shell -> dnd).
+we_set=0
+while sleep 2; do
+  if pw-dump 2>/dev/null | jq -e 'any(.[]; .type=="PipeWire:Interface:Node" and ((.info.props."media.name"//"")|startswith("xdph-streaming")))' >/dev/null; then
+    if [[ $we_set == 0 ]] && ! "$HOME/.local/bin/dnd" is-on; then
+      "$HOME/.local/bin/dnd" on && we_set=1
+    fi
+  elif [[ $we_set == 1 ]]; then
+    "$HOME/.local/bin/dnd" off; we_set=0
+  fi
+done

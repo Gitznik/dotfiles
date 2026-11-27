@@ -46,6 +46,7 @@ tooltip {
 
 #clock,
 #tray,
+#custom-dnd,
 #bluetooth,
 #network,
 #wireplumber,
@@ -56,6 +57,10 @@ tooltip {
 
 #custom-system {
   margin-right: 4px;
+}
+
+#custom-dnd.on {
+  color: @peach;
 }
 
 #bluetooth.off,

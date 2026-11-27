@@ -29,6 +29,10 @@ waybar
 bluetui
 wiremix
 
+# Notifications
+mako
+libnotify
+
 # Screenshots
 grim
 slurp

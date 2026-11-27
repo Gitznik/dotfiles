@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# dnd on|off|toggle|is-on|status: mako's do-not-disturb mode. status prints JSON for waybar.
+set -euo pipefail
+is_on() { makoctl mode | grep -qx do-not-disturb; }
+case ${1:-status} in
+  on) makoctl mode -a do-not-disturb >/dev/null ;;
+  off) makoctl mode -r do-not-disturb >/dev/null ;;
+  toggle) if is_on; then makoctl mode -r do-not-disturb; else makoctl mode -a do-not-disturb; fi >/dev/null ;;
+  is-on) is_on; exit ;;
+  status)
+    if is_on; then
+      echo '{"text": "󰂛", "class": "on", "tooltip": "Do not disturb (click to turn off)"}'
+    else
+      echo '{"text": "󰂚", "class": "off", "tooltip": "Notifications on (click for do not disturb)"}'
+    fi
+    exit ;;
+  *) echo "usage: dnd on|off|toggle|is-on|status" >&2; exit 2 ;;
+esac
+pkill -RTMIN+8 -x waybar || true   # refresh the bar's bell (custom/dnd, signal 8)

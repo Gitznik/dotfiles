@@ -5,9 +5,9 @@ set -euo pipefail
 
 repo=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 common=(zsh tmux nvim lazygit workmux mise)
-desktop=(hypr ghostty services swaylock screensaver waybar walker elephant tui screenshot)
+desktop=(hypr ghostty services swaylock screensaver waybar walker elephant tui screenshot notifications)
 system_services=(NetworkManager.service bluetooth.service)
-user_services=(hyprpolkitagent.service hypridle.service elephant.service walker.service waybar.service)
+user_services=(hyprpolkitagent.service hypridle.service elephant.service walker.service waybar.service dnd-on-screenshare.service crash-watch.service)
 
 die() { echo "bootstrap: $*" >&2; exit 1; }
 step() { echo "==> $*"; }

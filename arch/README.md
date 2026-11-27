@@ -1,6 +1,6 @@
 # Arch workstation
 
-Plain Arch + Hyprland, no Omarchy. Shared dotfiles (`zsh tmux nvim lazygit workmux`) live at the repo root. The Arch-only desktop lives in `arch/stow/` (`hypr ghostty services swaylock screensaver waybar walker elephant tui screenshot`), plus `arch/etc/` for system files. The Omarchy machine keeps using `just stow-all` on `main` and never stows `arch/stow/`.
+Plain Arch + Hyprland, no Omarchy. Shared dotfiles (`zsh tmux nvim lazygit workmux`) live at the repo root. The Arch-only desktop lives in `arch/stow/` (`hypr ghostty services swaylock screensaver waybar walker elephant tui screenshot notifications`), plus `arch/etc/` for system files. The Omarchy machine keeps using `just stow-all` on `main` and never stows `arch/stow/`.
 
 ## 1. Base install (per machine, by hand or `archinstall`)
 
@@ -78,10 +78,17 @@ The VM needs a virtio GPU with 3D/GL acceleration, or Hyprland won't start. `jus
 - [ ] Esc in satty discards: nothing saved, clipboard unchanged
 - [ ] `SUPER+CTRL+V` opens the clipboard history in walker; copy 3 text items, pick the 2nd, `Ctrl+V` pastes it; a screenshot shows up as an image entry
 
+### Milestone 4 checks (notifications)
+
+- [ ] `notify-send test hello` shows a Catppuccin toast top right, below the bar; clicking dismisses it; `notify-send -u critical x y` stays until clicked (peach border)
+- [ ] Bell in the bar: click toggles do not disturb (bell turns peach and crossed out); while on, `notify-send` shows nothing; `makoctl restore` brings back the last one after turning it off
+- [ ] Screen share (hardware, or VM if the portal works): start a portal screen share, e.g. in the browser; DND turns on by itself within ~2s, and turns off when the share stops. If DND was already on before sharing, it stays on afterwards
+- [ ] `sleep 300 & kill -SEGV $!`: a critical "sleep crashed" toast appears; **Details** opens `coredumpctl info` in Ghostty. A second crash of the same program within 60s is not announced
+- [ ] `systemctl --user status dnd-on-screenshare crash-watch` both running
+
 ### Later milestones (from the inventory)
 
-1. Notifications with DND + screen-share DND script; crash notifications
-2. Hardware: dock/lid, suspend/resume, second display (workspaces stay global), portal screen sharing
+1. Hardware: dock/lid, suspend/resume, second display (workspaces stay global), portal screen sharing
 
 ## Notes
 

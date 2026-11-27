@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+# Notify when one of my processes dumps core; "Details" opens coredumpctl info in a terminal.
+# Adapted from Omarchy 4.5.0 bin/omarchy-crash-watch (basecamp/omarchy, MIT): same journal
+# match, uid filter, name handling and 60s dedupe. Dropped: AI diagnosis, mute flags,
+# Omarchy notification helpers.
+set -uo pipefail
+
+readonly COREDUMP_MESSAGE_ID=fc2e22bc6ee647b6b90729ab34a250b1   # systemd.journal-fields(7)
+readonly dedupe_seconds=60
+declare -A last_notified
+
+announce() {
+  local name=$1 pid=$2 signal=$3
+  # -A blocks until the notification closes, so wait for the click in the background.
+  (
+    action=$(notify-send --urgency critical --app-name crash-watch --icon dialog-error \
+      --action details=Details "󱚡 $name crashed" "$signal, PID $pid")
+    [[ $action == details ]] && exec uwsm-app -- ghostty -e coredumpctl info "$pid"
+  ) &
+}
+
+# -n 0: don't re-announce old crashes after a restart.
+journalctl -f -n 0 -o json "MESSAGE_ID=$COREDUMP_MESSAGE_ID" 2>/dev/null |
+  while IFS= read -r entry; do
+    # "-" for empty fields so tab-splitting can't shift columns.
+    IFS=$'\t' read -r uid comm pid exe signal < <(
+      jq -r 'def field: if . == null or . == "" then "-" else . end;
+             [(._UID | field), (.COREDUMP_COMM | field), (.COREDUMP_PID | field),
+              (.COREDUMP_EXE | field), (.COREDUMP_SIGNAL_NAME | field)] | @tsv' <<<"$entry" 2>/dev/null
+    )
+    [[ $pid =~ ^[0-9]+$ && $uid =~ ^[0-9]+$ ]] || continue
+    ((uid == UID)) || continue
+
+    # comm is truncated to 15 chars, so prefer the executable's basename.
+    name=$comm
+    [[ $exe == /* ]] && name=${exe##*/}
+    name=${name##*/}
+    [[ -n $name && $name != "-" ]] || name=unknown
+    [[ $name == crash-watch ]] && continue
+
+    now=$EPOCHSECONDS
+    (((now - ${last_notified[$name]:-0}) < dedupe_seconds)) && continue
+    last_notified[$name]=$now
+    announce "$name" "$pid" "$signal"
+  done
