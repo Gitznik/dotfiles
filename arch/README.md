@@ -1,6 +1,6 @@
 # Arch workstation
 
-Plain Arch + Hyprland, no Omarchy. Shared dotfiles (`zsh tmux nvim lazygit workmux`) live at the repo root. The Arch-only desktop lives in `arch/stow/` (`hypr ghostty services swaylock screensaver waybar walker elephant tui screenshot notifications wallpaper`), plus `arch/etc/` for system files (greetd, tuigreet theme, Catppuccin console palette). The Omarchy machine keeps using `just stow-all` on `main` and never stows `arch/stow/`.
+Plain Arch + Hyprland, no Omarchy. Shared dotfiles (`zsh tmux nvim lazygit workmux`) live at the repo root. The Arch-only desktop lives in `arch/stow/` (`hypr ghostty services swaylock screensaver waybar walker elephant tui screenshot notifications wallpaper theme`), plus `arch/etc/` for system files (greetd, tuigreet theme, Catppuccin console palette). The Omarchy machine keeps using `just stow-all` on `main` and never stows `arch/stow/`.
 
 ## 1. Base install (per machine, by hand or `archinstall`)
 
@@ -86,6 +86,12 @@ The VM needs a virtio GPU with 3D/GL acceleration, or Hyprland won't start. `jus
 - [ ] `sleep 300 & kill -SEGV $!`: a critical "sleep crashed" toast appears; clicking it opens `coredumpctl info` in Ghostty. A second crash of the same program within 60s is not announced
 - [ ] `systemctl --user status dnd-on-screenshare crash-watch` both running
 - [ ] Coffee cup in the bar: click turns on stay awake (cup fills, peach); `journalctl --user -u hypridle` logs "systemd idle inhibit active" and no screensaver/lock/display-off happens past 330s; click again turns it off and idle works as before. `systemctl suspend` still locks first while it's on
+
+### Dark mode checks
+
+- [ ] `nautilus` and its file dialogs are dark (adw-gtk3-dark / libadwaita dark); `gsettings get org.gnome.desktop.interface color-scheme` is `'prefer-dark'`
+- [ ] `qt6ct` opens in the Catppuccin palette (mauve selection); Qt apps follow it
+- [ ] Same Adwaita cursor over windows, the bar and the desktop
 
 ### Later milestones (from the inventory)
 

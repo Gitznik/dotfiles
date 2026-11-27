@@ -41,6 +41,14 @@ satty
 # Wallpaper
 swaybg
 
+# Dark GTK/Qt theme
+adw-gtk-theme
+adwaita-icon-theme
+adwaita-cursors
+dconf
+qt6ct
+qt6-wayland
+
 # Desktop apps
 ghostty
 nautilus

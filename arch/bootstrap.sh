@@ -5,7 +5,7 @@ set -euo pipefail
 
 repo=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 common=(zsh tmux nvim lazygit workmux mise)
-desktop=(hypr ghostty services swaylock screensaver waybar walker elephant tui screenshot notifications wallpaper)
+desktop=(hypr ghostty services swaylock screensaver waybar walker elephant tui screenshot notifications wallpaper theme)
 system_services=(NetworkManager.service bluetooth.service)
 user_services=(hyprpolkitagent.service hypridle.service elephant.service walker.service waybar.service dnd-on-screenshare.service crash-watch.service swaybg.service)
 
@@ -29,7 +29,7 @@ mapfile -t aur < <(grep -v -E '^\s*(#|$)' "$repo/arch/packages-aur.txt")
 yay -S --needed --noconfirm --answerdiff None --answerclean None --removemake "${aur[@]}"
 
 # Real dirs first, so stow links files inside them instead of folding whole dirs into the repo.
-mkdir -p "$HOME"/.config/{systemd/user,walker,elephant/menus} "$HOME"/.local/{bin,share,state} "$HOME"/.zsh
+mkdir -p "$HOME"/.config/{systemd/user,walker,elephant/menus,gtk-3.0,gtk-4.0,qt6ct} "$HOME"/.local/{bin,share,state} "$HOME"/.zsh
 
 step "Checking for config conflicts"
 if ! stow -n -d "$repo" -t "$HOME" "${common[@]}" 2>/tmp/bootstrap-stow.$$ ||
@@ -47,6 +47,17 @@ stow -d "$repo/arch/stow" -t "$HOME" "${desktop[@]}"
 
 step "mise tools (global config)"
 mise install --yes
+
+step "Dark GTK/Qt theme"
+gsettings set org.gnome.desktop.interface color-scheme prefer-dark
+gsettings set org.gnome.desktop.interface gtk-theme adw-gtk3-dark
+gsettings set org.gnome.desktop.interface icon-theme Adwaita
+gsettings set org.gnome.desktop.interface cursor-theme Adwaita
+gsettings set org.gnome.desktop.interface cursor-size 24
+# qt6ct needs an absolute scheme path, so its config is rendered, and only if missing:
+# qt6ct rewrites the file when you change settings in its GUI.
+[[ -e $HOME/.config/qt6ct/qt6ct.conf ]] ||
+  sed "s|@HOME@|$HOME|" "$repo/arch/etc/qt6ct/qt6ct.conf" >"$HOME/.config/qt6ct/qt6ct.conf"
 
 step "Services"
 sudo systemctl enable --now "${system_services[@]}"
