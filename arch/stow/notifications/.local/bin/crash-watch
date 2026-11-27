@@ -16,7 +16,8 @@ announce() {
   (
     action=$(notify-send --urgency critical --app-name crash-watch --icon dialog-error \
       --action default=Details "󱚡 $name crashed" "$signal, PID $pid. Click for details")
-    [[ $action == default ]] && exec uwsm-app -- ghostty -e coredumpctl info "$pid"
+    # Keep the window open: short output makes less (-F) quit at once, and ghostty with it.
+    [[ $action == default ]] && exec uwsm-app -- ghostty --wait-after-command=true -e coredumpctl info "$pid"
   ) &
 }
 
