@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# stay-awake on|off|toggle|status: hold a systemd idle inhibitor, which hypridle honors, so
+# the screensaver, lock and display-off are skipped. Suspend still locks first.
+# status prints JSON for waybar.
+set -euo pipefail
+unit=stay-awake
+is_on() { systemctl --user is-active --quiet "$unit"; }
+case ${1:-status} in
+  on)
+    is_on || systemd-run --user --quiet --unit="$unit" --description="Stay awake (idle inhibitor)" \
+      systemd-inhibit --what=idle --who=stay-awake --why="Stay awake (bar toggle)" sleep infinity ;;
+  off) systemctl --user stop "$unit" 2>/dev/null || true ;;
+  toggle) if is_on; then "$0" off; else "$0" on; fi; exit ;;
+  status)
+    if is_on; then
+      echo '{"text": "󰅶", "class": "on", "tooltip": "Staying awake: no screensaver, lock or display off (click to stop)"}'
+    else
+      echo '{"text": "󰛊", "class": "off", "tooltip": "Stay awake (click)"}'
+    fi
+    exit ;;
+  *) echo "usage: stay-awake on|off|toggle|status" >&2; exit 2 ;;
+esac
+pkill -RTMIN+9 -x waybar || true   # refresh the bar (custom/stay-awake, signal 9)

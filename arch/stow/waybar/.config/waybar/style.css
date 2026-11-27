@@ -46,6 +46,7 @@ tooltip {
 
 #clock,
 #tray,
+#custom-stay-awake,
 #custom-dnd,
 #bluetooth,
 #network,
@@ -59,6 +60,7 @@ tooltip {
   margin-right: 4px;
 }
 
+#custom-stay-awake.on,
 #custom-dnd.on {
   color: @peach;
 }

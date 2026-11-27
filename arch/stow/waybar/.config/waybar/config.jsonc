@@ -7,7 +7,7 @@
   "reload_style_on_change": true,
   "modules-left": ["hyprland/workspaces"],
   "modules-center": ["clock"],
-  "modules-right": ["tray", "custom/dnd", "bluetooth", "network", "wireplumber", "battery", "custom/system"],
+  "modules-right": ["tray", "custom/stay-awake", "custom/dnd", "bluetooth", "network", "wireplumber", "battery", "custom/system"],
 
   "hyprland/workspaces": {
     "on-click": "activate",
@@ -59,6 +59,13 @@
     "format-full": "󰁹",
     "format-icons": ["󰁺", "󰁼", "󰁾", "󰂀", "󰂂"],
     "states": { "warning": 20, "critical": 10 }
+  },
+  "custom/stay-awake": {
+    "exec": "$HOME/.local/bin/stay-awake status",
+    "return-type": "json",
+    "interval": 30,
+    "signal": 9,
+    "on-click": "$HOME/.local/bin/stay-awake toggle"
   },
   "custom/dnd": {
     "exec": "$HOME/.local/bin/dnd status",
