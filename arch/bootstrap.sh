@@ -43,7 +43,10 @@ fi
 profiles=()
 [[ -f $profile_file ]] && mapfile -t profiles <"$profile_file"
 if [[ ! -f $profile_file && -t 0 ]]; then
-  read -rp "Which apps besides shared? work / private / work private / none: " answer
+  answer=""
+  while [[ -z $answer ]]; do
+    read -rp "Which apps besides shared? work / private / work private / none: " answer
+  done
   read -ra profiles <<<"${answer/none/}"
   for p in "${profiles[@]}"; do [[ $p == work || $p == private ]] || die "unknown profile '$p'"; done
   mkdir -p "$(dirname "$profile_file")"
