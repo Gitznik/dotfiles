@@ -8,7 +8,7 @@ repo=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 common=(zsh tmux nvim lazygit workmux mise)
 desktop=(hypr ghostty services swaylock screensaver waybar walker elephant tui screenshot notifications wallpaper theme)
 system_services=(NetworkManager.service bluetooth.service cups.socket ufw.service power-profiles-daemon.service docker.socket plocate-updatedb.timer)
-user_services=(hyprpolkitagent.service hypridle.service elephant.service walker.service waybar.service dnd-on-screenshare.service crash-watch.service swaybg.service swayosd.service gnome-keyring-daemon.socket)
+user_services=(hyprpolkitagent.service hypridle.service elephant.service walker.service waybar.service dnd-on-screenshare.service crash-watch.service swaybg.service swayosd.service)
 
 die() { echo "bootstrap: $*" >&2; exit 1; }
 step() { echo "==> $*"; }
@@ -51,7 +51,7 @@ done
 yay -S --needed --noconfirm --answerdiff None --answerclean None --removemake "${apps[@]}"
 
 # Real dirs first, so stow links files inside them instead of folding whole dirs into the repo.
-mkdir -p "$HOME"/.config/{systemd/user,walker,elephant/menus,gtk-3.0,gtk-4.0,qt6ct} "$HOME"/.local/{bin,share,state} "$HOME"/.zsh
+mkdir -p "$HOME"/.config/{systemd/user,environment.d,walker,elephant/menus,gtk-3.0,gtk-4.0,qt6ct} "$HOME"/.local/{bin,share,state} "$HOME"/.zsh
 
 step "Checking for config conflicts"
 if ! stow -n -d "$repo" -t "$HOME" "${common[@]}" 2>/tmp/bootstrap-stow.$$ ||
@@ -97,6 +97,8 @@ if ! id -nG "$USER" | grep -qw docker; then
   echo "bootstrap: added $USER to the docker group (takes effect at next login)"
 fi
 systemctl --user enable "${user_services[@]}"
+# Sockets are safe to start outside a session; the keyring is then reachable right away.
+systemctl --user enable --now gnome-keyring-daemon.socket
 # On a rerun inside a session: elephant only loads providers at startup, so new ones need a restart.
 systemctl --user try-restart elephant.service walker.service 2>/dev/null || true
 

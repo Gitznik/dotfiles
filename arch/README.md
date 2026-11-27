@@ -26,7 +26,7 @@ arch/bootstrap.sh work            # or: private, or: work private
 
 Apps come in three lists: `apps-shared.txt` (every machine), `apps-work.txt`, `apps-private.txt`. The profile you pass is remembered in `~/.config/dotfiles-profile`, so later reruns need no argument; passing profiles again replaces it.
 
-**Real machines only (not the VM):** SSH keys stay in Bitwarden and are never written to disk. Log into the Bitwarden desktop app, enable Settings > SSH agent, and keep the keys as SSH key items. The session points `SSH_AUTH_SOCK` at `~/.bitwarden-ssh-agent.sock` (hypr `env.lua`). Then switch the remote: `git -C ~/dotfiles remote set-url origin git@github.com:Gitznik/dotfiles.git`.
+**Real machines only (not the VM):** SSH keys stay in Bitwarden and are never written to disk. Log into the Bitwarden desktop app, enable Settings > SSH agent, and keep the keys as SSH key items. `~/.config/environment.d/ssh-agent.conf` points `SSH_AUTH_SOCK` at `~/.bitwarden-ssh-agent.sock` for every app and user service (takes effect after a reboot). Then switch the remote: `git -C ~/dotfiles remote set-url origin git@github.com:Gitznik/dotfiles.git`.
 
 **Keyring:** the first app that stores a login (Element, Chromium, Slack…) asks for a new keyring password. Leave it **empty**: auto-login never types a password, so a password-protected keyring would prompt on every boot, and the disk is already encrypted by LUKS.
 
