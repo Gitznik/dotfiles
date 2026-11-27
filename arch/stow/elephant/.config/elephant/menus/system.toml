@@ -1,28 +1,28 @@
 name = "system"
 name_pretty = "System"
-icon = "system-shutdown"
+icon = "system-shutdown-symbolic"
 
 [[entries]]
 text = "Lock"
-icon = "system-lock-screen"
+icon = "system-lock-screen-symbolic"
 actions = { "lock" = "loginctl lock-session" }
 
 [[entries]]
 text = "Suspend"
-icon = "system-suspend"
+icon = "weather-clear-night-symbolic"
 actions = { "suspend" = "systemctl suspend" }
 
 [[entries]]
 text = "Log out"
-icon = "system-log-out"
+icon = "system-log-out-symbolic"
 actions = { "logout" = "uwsm stop" }
 
 [[entries]]
 text = "Reboot"
-icon = "system-reboot"
+icon = "system-reboot-symbolic"
 actions = { "reboot" = "systemctl reboot" }
 
 [[entries]]
 text = "Shut down"
-icon = "system-shutdown"
+icon = "system-shutdown-symbolic"
 actions = { "poweroff" = "systemctl poweroff" }
