@@ -1,3 +1,5 @@
+theme = "catppuccin-mocha"
+
 # Layered over walker's built-in defaults. "menus" makes the elephant menus (e.g. system) searchable from SUPER+D.
 [providers]
 default = ["desktopapplications", "menus"]
