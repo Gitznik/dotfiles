@@ -4,3 +4,5 @@ golangci-lint = "latest"
 prek = "latest"
 python = "latest"
 uv = "latest"
+# opencode TUI; the desktop app comes from the AUR (arch/apps-shared.txt). aqua = release binary, no Node.
+"aqua:anomalyco/opencode" = "latest"
