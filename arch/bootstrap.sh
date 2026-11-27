@@ -51,6 +51,8 @@ mise install --yes
 step "Services"
 sudo systemctl enable --now "${system_services[@]}"
 systemctl --user enable "${user_services[@]}"
+# On a rerun inside a session: elephant only loads providers at startup, so new ones need a restart.
+systemctl --user try-restart elephant.service walker.service 2>/dev/null || true
 
 step "Boot splash (Plymouth theme)"
 theme_src="$repo/arch/plymouth/gitznik" theme_dst=/usr/share/plymouth/themes/gitznik
