@@ -103,7 +103,7 @@ The VM needs a virtio GPU with 3D/GL acceleration, or Hyprland won't start. `jus
 - [ ] `cat ~/.config/dotfiles-profile` shows the profile; apps from `apps-shared.txt` and that profile launch from `SUPER+D`
 - [ ] Volume keys show the Catppuccin OSD and repeat while held; mute, mic mute, play/pause/next work, also on the lock screen. Brightness keys on laptops
 - [ ] `SUPER+D` then `12*7`: the calculator result appears
-- [ ] Opening a PDF, image, video and folder uses Papers, imv, mpv, Nautilus (`xdg-open`)
+- [ ] Links open in Zen; a PDF, image, video and folder open in Papers, imv, mpv, Nautilus (`xdg-open`)
 - [ ] `sudo ufw status`: active, deny incoming, 53317 allowed (and 22 limited where sshd is enabled); LocalSend sees another device (hardware)
 - [ ] `docker run --rm hello-world` works without sudo after re-login
 - [ ] Element/Chromium login survives a reboot (keyring with an empty password)

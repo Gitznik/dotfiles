@@ -103,6 +103,8 @@ systemctl --user try-restart elephant.service walker.service 2>/dev/null || true
 step "Default apps"
 xdg-user-dirs-update
 mime() { local app=$1; shift; xdg-mime default "$app" "$@"; }
+xdg-settings set default-web-browser zen.desktop
+mime zen.desktop x-scheme-handler/http x-scheme-handler/https text/html application/xhtml+xml
 mime org.gnome.Nautilus.desktop inode/directory
 mime org.gnome.Papers.desktop application/pdf
 mime imv.desktop image/png image/jpeg image/gif image/webp image/bmp image/tiff image/avif image/heic image/svg+xml
