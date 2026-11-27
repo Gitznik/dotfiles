@@ -5,9 +5,9 @@ set -euo pipefail
 
 repo=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 common=(zsh tmux nvim lazygit workmux mise)
-desktop=(hypr ghostty services swaylock screensaver)
+desktop=(hypr ghostty services swaylock screensaver waybar walker elephant tui)
 system_services=(NetworkManager.service bluetooth.service)
-user_services=(hyprpolkitagent.service hypridle.service elephant.service walker.service)
+user_services=(hyprpolkitagent.service hypridle.service elephant.service walker.service waybar.service)
 
 die() { echo "bootstrap: $*" >&2; exit 1; }
 step() { echo "==> $*"; }
@@ -29,7 +29,7 @@ mapfile -t aur < <(grep -v -E '^\s*(#|$)' "$repo/arch/packages-aur.txt")
 yay -S --needed --noconfirm --answerdiff None --answerclean None --removemake "${aur[@]}"
 
 # Real dirs first, so stow links files inside them instead of folding whole dirs into the repo.
-mkdir -p "$HOME"/.config/systemd/user "$HOME"/.local/{bin,share,state} "$HOME"/.zsh
+mkdir -p "$HOME"/.config/{systemd/user,walker,elephant/menus} "$HOME"/.local/{bin,share,state} "$HOME"/.zsh
 
 step "Checking for config conflicts"
 if ! stow -n -d "$repo" -t "$HOME" "${common[@]}" 2>/tmp/bootstrap-stow.$$ ||

@@ -24,6 +24,11 @@ networkmanager
 bluez
 bluez-utils
 
+# Bar and its popups
+waybar
+bluetui
+wiremix
+
 # Desktop apps
 ghostty
 nautilus

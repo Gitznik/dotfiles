@@ -1,6 +1,6 @@
 # Arch workstation
 
-Plain Arch + Hyprland, no Omarchy. Shared dotfiles (`zsh tmux nvim lazygit workmux`) live at the repo root. The Arch-only desktop lives in `arch/stow/` (`hypr ghostty services swaylock screensaver`), plus `arch/etc/` for system files. The Omarchy machine keeps using `just stow-all` on `main` and never stows `arch/stow/`.
+Plain Arch + Hyprland, no Omarchy. Shared dotfiles (`zsh tmux nvim lazygit workmux`) live at the repo root. The Arch-only desktop lives in `arch/stow/` (`hypr ghostty services swaylock screensaver waybar walker elephant tui`), plus `arch/etc/` for system files. The Omarchy machine keeps using `just stow-all` on `main` and never stows `arch/stow/`.
 
 ## 1. Base install (per machine, by hand or `archinstall`)
 
@@ -40,7 +40,7 @@ The VM needs a virtio GPU with 3D/GL acceleration, or Hyprland won't start. `jus
 3. Run the checks below. Fix problems **in the repo** (push, then pull in the guest), not by hand in the guest.
 4. Reboot, rerun `arch/bootstrap.sh`: no errors, nothing duplicated, no config overwritten.
 5. Restore **clean-base**, repeat step 2 and pass the checks with no manual fixes.
-6. Record the result: `git rev-parse --short HEAD` and `pacman -Q hyprland uwsm ghostty walker-bin elephant-bin`.
+6. Record the result: `git rev-parse --short HEAD` and `pacman -Q hyprland uwsm ghostty walker-bin elephant-bin waybar`.
 
 ### Milestone 1 checks
 
@@ -59,12 +59,22 @@ The VM needs a virtio GPU with 3D/GL acceleration, or Hyprland won't start. `jus
 - [ ] Suspend (`systemctl suspend`) locks first; on resume the lock screen shows, never the unlocked desktop
 - [ ] Locker robustness (hardware first; hyprlock crashed here when the display turned off while locked, see hyprwm/hyprlock#953): lock, then 10× `hyprctl dispatch 'hl.dsp.dpms({ action = "disable" })'` / `enable` from another TTY: swaylock survives. Then `pkill -9 swaylock`: the session **stays locked** (Hyprland's "lockscreen died" screen), and `swaylock` started from a TTY with `WAYLAND_DISPLAY` set takes over and unlocks normally
 
+### Milestone 2 checks (bar and quick controls)
+
+- [ ] Waybar starts with the session (`systemctl --user status waybar`): workspaces left, clock center, tray / Bluetooth / network / audio / battery / power right. Catppuccin colors; Nerd Font icons render (no boxes)
+- [ ] Clock shows date, time and UTC offset (e.g. `UTC+0100`); hovering shows a month calendar
+- [ ] Workspace buttons follow `SUPER+1…0` and switch on click
+- [ ] Bluetooth icon: click opens `bluetui` as a centered floating window; clicking again focuses it instead of opening a second one. Pair/connect a device (hardware)
+- [ ] Network icon: click opens `nmtui connect`; switching Wi-Fi works (hardware; the VM only has ethernet)
+- [ ] Audio icon: click opens `wiremix`, scroll changes volume, right-click mutes (icon dims)
+- [ ] Battery shows on laptops, is hidden in the VM
+- [ ] `SUPER+ESCAPE` and the power icon open the System menu; typing `lock`/`suspend` in `SUPER+D` finds the same entries. Lock, log out and reboot work from it
+
 ### Later milestones (from the inventory)
 
-1. Bar with Bluetooth / Wi-Fi / audio controls; clock showing the UTC offset; system menu (lock/suspend/reboot) in walker via `elephant-menus`
-2. Screenshot on `PRINT`; clipboard history via `elephant-clipboard`
-3. Notifications with DND + screen-share DND script; crash notifications
-4. Hardware: dock/lid, suspend/resume, second display (workspaces stay global), portal screen sharing
+1. Screenshot on `PRINT`; clipboard history via `elephant-clipboard`
+2. Notifications with DND + screen-share DND script; crash notifications
+3. Hardware: dock/lid, suspend/resume, second display (workspaces stay global), portal screen sharing
 
 ## Notes
 

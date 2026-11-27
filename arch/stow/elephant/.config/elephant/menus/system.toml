@@ -1,0 +1,28 @@
+name = "system"
+name_pretty = "System"
+icon = "system-shutdown"
+
+[[entries]]
+text = "Lock"
+icon = "system-lock-screen"
+actions = { "lock" = "loginctl lock-session" }
+
+[[entries]]
+text = "Suspend"
+icon = "system-suspend"
+actions = { "suspend" = "systemctl suspend" }
+
+[[entries]]
+text = "Log out"
+icon = "system-log-out"
+actions = { "logout" = "uwsm stop" }
+
+[[entries]]
+text = "Reboot"
+icon = "system-reboot"
+actions = { "reboot" = "systemctl reboot" }
+
+[[entries]]
+text = "Shut down"
+icon = "system-shutdown"
+actions = { "poweroff" = "systemctl poweroff" }

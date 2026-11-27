@@ -13,6 +13,7 @@ bind("SUPER + W", hl.dsp.window.close())
 bind("SUPER + T", hl.dsp.window.float({ action = "toggle" }))
 bind("SUPER + F", hl.dsp.window.fullscreen({ mode = "fullscreen" }))
 bind("SUPER + S", hl.dsp.layout("togglesplit"))
+bind("SUPER + ESCAPE", hl.dsp.exec_cmd("walker -m menus:system"))
 bind("SUPER + SHIFT + ESCAPE", hl.dsp.exec_cmd("uwsm stop"))
 bind("SUPER + CTRL + L", hl.dsp.exec_cmd("loginctl lock-session"))
 

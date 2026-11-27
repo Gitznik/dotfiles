@@ -1,0 +1,67 @@
+{
+  // Catppuccin Mocha; colors in style.css. Click a module to open its TUI (tui-launch).
+  "layer": "top",
+  "position": "top",
+  "height": 26,
+  "spacing": 0,
+  "reload_style_on_change": true,
+  "modules-left": ["hyprland/workspaces"],
+  "modules-center": ["clock"],
+  "modules-right": ["tray", "bluetooth", "network", "wireplumber", "battery", "custom/system"],
+
+  "hyprland/workspaces": {
+    "on-click": "activate",
+    "format": "{name}"
+  },
+  "clock": {
+    "format": "{:%a %d %b  %H:%M  UTC%z}",
+    "tooltip-format": "<tt>{calendar}</tt>",
+    "calendar": { "mode": "month", "weeks-pos": "left", "format": { "today": "<b><u>{}</u></b>", "weeks": "<span color='#6c7086'>W{}</span>" } }
+  },
+  "tray": {
+    "icon-size": 14,
+    "spacing": 10
+  },
+  "bluetooth": {
+    "format": "󰂯",
+    "format-connected": "󰂱",
+    "format-disabled": "󰂲",
+    "format-off": "󰂲",
+    "format-no-controller": "",
+    "tooltip-format": "{controller_alias}: {status}",
+    "tooltip-format-connected": "{device_enumerate}",
+    "tooltip-format-enumerate-connected": "{device_alias}",
+    "on-click": "$HOME/.local/bin/tui-launch bluetui"
+  },
+  "network": {
+    "format-wifi": "{icon}",
+    "format-ethernet": "󰈀",
+    "format-disconnected": "󰤮",
+    "format-icons": ["󰤯", "󰤟", "󰤢", "󰤥", "󰤨"],
+    "tooltip-format-wifi": "{essid} ({signalStrength}%)",
+    "tooltip-format-ethernet": "{ifname}",
+    "tooltip-format-disconnected": "Disconnected",
+    "on-click": "$HOME/.local/bin/tui-launch nmtui connect"
+  },
+  "wireplumber": {
+    "format": "{icon}",
+    "format-muted": "󰝟",
+    "format-icons": ["󰕿", "󰖀", "󰕾"],
+    "tooltip-format": "{node_name}: {volume}%",
+    "scroll-step": 5,
+    "on-click": "$HOME/.local/bin/tui-launch wiremix",
+    "on-click-right": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
+  },
+  "battery": {
+    "format": "{capacity}% {icon}",
+    "format-charging": "{capacity}% 󰂄",
+    "format-full": "󰁹",
+    "format-icons": ["󰁺", "󰁼", "󰁾", "󰂀", "󰂂"],
+    "states": { "warning": 20, "critical": 10 }
+  },
+  "custom/system": {
+    "format": "󰐥",
+    "tooltip-format": "System menu (SUPER+ESCAPE)",
+    "on-click": "walker -m menus:system"
+  }
+}

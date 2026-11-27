@@ -4,4 +4,5 @@ walker-bin
 elephant-bin
 elephant-desktopapplications-bin
 elephant-providerlist-bin
+elephant-menus-bin
 ttfx

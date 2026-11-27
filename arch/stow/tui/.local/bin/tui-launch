@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# tui-launch <command> [args...]: focus the floating TUI window for <command>, or open one.
+# Windows get class local.tui.<command>; hypr/looknfeel.lua floats and centers them.
+set -euo pipefail
+class="local.tui.$(basename "$1")"
+addr=$(hyprctl clients -j | jq -r --arg c "$class" '.[] | select(.class == $c) | .address' | head -n1)
+if [[ -n $addr ]]; then
+  exec hyprctl dispatch "hl.dsp.focus({ window = \"address:$addr\" })" >/dev/null
+fi
+exec uwsm-app -- ghostty --class="$class" -e "$@"
