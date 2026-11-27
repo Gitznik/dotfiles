@@ -7,5 +7,6 @@ arch-bootstrap:
   arch/bootstrap.sh
 
 # Arch test VM: iso | create | install | seal | reset | run | ssh-key | ssh (see arch/vm/vm.sh)
+[positional-arguments]
 vm *args:
-  arch/vm/vm.sh {{args}}
+  arch/vm/vm.sh "$@"
