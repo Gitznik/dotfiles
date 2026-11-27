@@ -42,6 +42,13 @@ if (($#)); then
 fi
 profiles=()
 [[ -f $profile_file ]] && mapfile -t profiles <"$profile_file"
+if [[ ! -f $profile_file && -t 0 ]]; then
+  read -rp "Which apps besides shared? work / private / work private / none: " answer
+  read -ra profiles <<<"${answer/none/}"
+  for p in "${profiles[@]}"; do [[ $p == work || $p == private ]] || die "unknown profile '$p'"; done
+  mkdir -p "$(dirname "$profile_file")"
+  printf '%s\n' "${profiles[@]}" >"$profile_file"
+fi
 echo "bootstrap: app profiles: shared ${profiles[*]:-(no work/private; pass 'work' and/or 'private')}"
 if [[ " ${profiles[*]} " == *" private "* ]] && ! grep -q '^\[multilib\]' /etc/pacman.conf; then
   die "the private apps need [multilib] (steam): uncomment it in /etc/pacman.conf, run 'sudo pacman -Sy', rerun"
@@ -168,6 +175,11 @@ if [[ $(findmnt -no FSTYPE /) == btrfs ]]; then
     fi
     # inotify-tools: limine-snapper-sync watches the snapshot list (else it falls back to a snapper plugin).
     yay -S --needed --noconfirm --answerdiff None --answerclean None inotify-tools limine-mkinitcpio-hook limine-snapper-sync
+    # Snapshots are read-only: this hook boots them with a temporary writable overlay.
+    if ! grep -qE '^\s*HOOKS=.*btrfs-overlayfs' /etc/mkinitcpio.conf; then
+      if grep -qE '^\s*HOOKS=.*\bsystemd\b' /etc/mkinitcpio.conf; then ov=sd-btrfs-overlayfs; else ov=btrfs-overlayfs; fi
+      sudo sed -i -E "/^\s*HOOKS=/ s/\bfilesystems\b/filesystems $ov/" /etc/mkinitcpio.conf
+    fi
     sudo limine-update
     sudo systemctl enable --now limine-snapper-sync.service
     sudo limine-snapper-sync   # add the snapshots that existed before the tool to the boot menu now
