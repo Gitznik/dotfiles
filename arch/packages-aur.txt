@@ -1,4 +1,4 @@
-# AUR. Not installed by bootstrap.sh: review each PKGBUILD, then build manually.
+# AUR. Installed by bootstrap.sh via yay (yay-bin is bootstrapped if missing).
 zen-browser-bin
 walker-bin
 elephant-bin

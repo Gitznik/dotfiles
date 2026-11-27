@@ -22,9 +22,9 @@ cd ~/dotfiles && git switch arch
 arch/bootstrap.sh
 ```
 
-The bootstrap installs `packages-repo.txt`, checks for conflicts with existing files, stows the shared and desktop packages, installs the greetd config, enables services and sets zsh as the login shell. If any file would be overwritten, it stops before changing anything. Rerunning it is safe.
+The bootstrap installs `packages-repo.txt` and `packages-aur.txt`, checks for conflicts with existing files, stows the shared and desktop packages, installs the greetd config, enables services and sets zsh as the login shell. If any file would be overwritten, it stops before changing anything. Rerunning it is safe.
 
-AUR packages (`packages-aur.txt`: walker, elephant and its providers, ttfx, zen-browser) are only listed. Review each PKGBUILD and build it yourself; walker won't work until you do.
+AUR packages (`packages-aur.txt`: walker, elephant and its providers, ttfx, zen-browser) are installed with yay, which the bootstrap installs first if missing. PKGBUILDs are not reviewed; the list prefers `-bin` packages that repackage upstream release binaries.
 
 Reboot. After the LUKS passphrase, greetd logs you straight into Hyprland (via uwsm). After logging out, tuigreet asks for your password.
 

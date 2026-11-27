@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Workstation setup for a clean, bootable Arch install. Safe to rerun.
-# Never partitions disks, never overwrites existing config, never builds AUR packages.
+# Never partitions disks, never overwrites existing config.
 set -euo pipefail
 
 repo=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
@@ -17,6 +17,16 @@ grep -qx 'ID=arch' /etc/os-release || die "not Arch Linux"
 
 step "Official packages"
 grep -v -E '^\s*(#|$)' "$repo/arch/packages-repo.txt" | sudo pacman -S --needed --noconfirm -
+
+step "AUR packages"
+if ! command -v yay >/dev/null; then
+  build=$(mktemp -d)
+  git clone --depth 1 https://aur.archlinux.org/yay-bin.git "$build/yay-bin"
+  (cd "$build/yay-bin" && makepkg -si --noconfirm --needed)
+  rm -rf "$build"
+fi
+mapfile -t aur < <(grep -v -E '^\s*(#|$)' "$repo/arch/packages-aur.txt")
+yay -S --needed --noconfirm --answerdiff None --answerclean None --removemake "${aur[@]}"
 
 # Real dirs first, so stow links files inside them instead of folding whole dirs into the repo.
 mkdir -p "$HOME"/.config/systemd/user "$HOME"/.local/{bin,share,state} "$HOME"/.zsh
@@ -52,5 +62,4 @@ if [[ $(getent passwd "$USER" | cut -d: -f7) != /usr/bin/zsh ]]; then
   chsh -s /usr/bin/zsh
 fi
 
-step "Done. Reboot to log in via greetd. AUR packages to review and build manually:"
-grep -v -E '^\s*(#|$)' "$repo/arch/packages-aur.txt" | sed 's/^/    /'
+step "Done. Reboot to log in via greetd."
