@@ -7,4 +7,6 @@ addr=$(hyprctl clients -j | jq -r --arg c "$class" '.[] | select(.class == $c) |
 if [[ -n $addr ]]; then
   exec hyprctl dispatch "hl.dsp.focus({ window = \"address:$addr\" })" >/dev/null
 fi
-exec uwsm-app -- ghostty --class="$class" -e "$@"
+# Escape closes the popup; no close confirmation, so focus loss (hypr/popups.lua) closes it too.
+exec uwsm-app -- ghostty --class="$class" --confirm-close-surface=false \
+  --keybind=escape=close_surface -e "$@"
