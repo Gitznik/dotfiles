@@ -40,8 +40,10 @@ fi
 rm -f /tmp/bootstrap-stow.$$
 
 step "Linking dotfiles"
-stow -R -d "$repo" -t "$HOME" "${common[@]}"
-stow -R -d "$repo/arch/stow" -t "$HOME" "${desktop[@]}"
+# Not -R: restowing the root packages walks ~/.local/bin, sees links into arch/stow and treats
+# arch/ as a missing root package. Plain stow is idempotent; remove stale links with stow -D.
+stow -d "$repo" -t "$HOME" "${common[@]}"
+stow -d "$repo/arch/stow" -t "$HOME" "${desktop[@]}"
 
 step "Services"
 sudo systemctl enable --now "${system_services[@]}"
