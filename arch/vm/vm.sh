@@ -8,6 +8,9 @@ iso_dir=${VM_ISO_DIR:-$HOME/vms/iso}
 mirror=${VM_MIRROR:-https://geo.mirror.pkgbuild.com/iso}
 ovmf_code=/usr/share/edk2/x64/OVMF_CODE.4m.fd
 ovmf_vars=/usr/share/edk2/x64/OVMF_VARS.4m.fd
+key=$HOME/vms/id_vm
+# Guest host keys change on every reset; never record them.
+ssh_opts=(-p 2222 -i "$key" -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR)
 
 die() { echo "vm: $*" >&2; exit 1; }
 
@@ -69,20 +72,30 @@ case ${1:-} in
     install -m644 "$dir/base-vars.fd" "$dir/work-vars.fd"
     echo "work.qcow2 reset to clean-base"
     ;;
+  ssh-key)
+    [[ -f $key ]] || ssh-keygen -q -t ed25519 -N '' -C arch-test-vm -f "$key"
+    ssh-copy-id -i "$key.pub" "${ssh_opts[@]}" "${VM_USER:-$USER}@localhost"
+    ;;
+  ssh)
+    shift
+    exec ssh "${ssh_opts[@]}" "${VM_USER:-$USER}@localhost" "$@"
+    ;;
   run)
     [[ -f $dir/work.qcow2 ]] || die "no overlay; run: vm.sh seal (or reset)"
     qemu "$dir/work.qcow2" "$dir/work-vars.fd"
     ;;
   *)
     cat >&2 <<EOF
-usage: vm.sh iso|create|install|seal|reset|run
+usage: vm.sh iso|create|install|seal|reset|run|ssh-key|ssh
   iso      download + verify the latest Arch ISO into $iso_dir
   create   new base disk, boot the ISO for the base install
   install  boot the ISO against the unsealed base again
   seal     make base read-only (clean-base) and create the work overlay
   reset    discard work overlay, back to clean-base
   run      boot the work overlay
-Env: VM_DIR VM_CPUS VM_MEM VM_DISK. Guest SSH: localhost:2222. Release grab: Ctrl+Alt+G.
+  ssh-key  create ~/vms/id_vm and install it in the guest (asks for the guest password once)
+  ssh      ssh into the running guest, optionally running a command
+Env: VM_DIR VM_CPUS VM_MEM VM_DISK VM_USER. Guest SSH: localhost:2222 (needs openssh + sshd in the guest). Release grab: Ctrl+Alt+G.
 EOF
     exit 1
     ;;
