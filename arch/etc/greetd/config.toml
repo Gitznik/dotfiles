@@ -1,0 +1,13 @@
+# Installed by arch/bootstrap.sh. @USER@ is replaced with the bootstrapping user.
+# Boot: the LUKS passphrase is the only prompt, then auto-login once.
+# After logging out: tuigreet login prompt.
+[terminal]
+vt = 1
+
+[initial_session]
+command = "uwsm start hyprland.desktop"
+user = "@USER@"
+
+[default_session]
+command = "tuigreet --time --remember --cmd 'uwsm start hyprland.desktop'"
+user = "greeter"

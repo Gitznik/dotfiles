@@ -1,0 +1,7 @@
+# AUR. Not installed by bootstrap.sh: review each PKGBUILD, then build manually.
+zen-browser-bin
+walker-bin
+elephant-bin
+elephant-desktopapplications-bin
+elephant-providerlist-bin
+ttfx

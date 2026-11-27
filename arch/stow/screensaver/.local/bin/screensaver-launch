@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Adapted from Omarchy 4.5.0 bin/omarchy-launch-screensaver (basecamp/omarchy, MIT).
+# Single window on the focused monitor; Omarchy opens one per monitor.
+pgrep -f '[l]ocal.screensaver' >/dev/null && exit 0
+exec uwsm-app -- ghostty --class=local.screensaver \
+  --config-file="$HOME/.config/ghostty/screensaver" --font-size=18 \
+  -e "$HOME/.local/bin/screensaver-run"

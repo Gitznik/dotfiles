@@ -1,5 +1,5 @@
 
-. "$HOME/.local/share/../bin/env"
+[[ -f "$HOME/.local/bin/env" ]] && . "$HOME/.local/bin/env"
 source "$HOME/.zsh/antigen.zsh"
 antigen use oh-my-zsh
 
@@ -93,14 +93,16 @@ if [[ -f "$HOME/.config/secrets/shell.env" ]]; then
 fi
 
 export PATH=/home/robert/.cargo/bin:$PATH
-export GOBIN="$(go env GOPATH)/bin"
-export PATH="$PATH:$GOBIN"
+if command -v go &>/dev/null; then
+  export GOBIN="$(go env GOPATH)/bin"
+  export PATH="$PATH:$GOBIN"
+fi
 autoload -Uz compinit && compinit
 add-zsh-hook -d precmd _antigen_compinit
 
-eval "$(fzf --zsh)"
-eval "$(zoxide init zsh)"
-eval "$(workmux completions zsh)"
-eval "$(COMPLETE=zsh prek)"
-eval "$(starship init zsh)"
+command -v fzf &>/dev/null && eval "$(fzf --zsh)"
+command -v zoxide &>/dev/null && eval "$(zoxide init zsh)"
+command -v workmux &>/dev/null && eval "$(workmux completions zsh)"
+command -v prek &>/dev/null && eval "$(COMPLETE=zsh prek)"
+command -v starship &>/dev/null && eval "$(starship init zsh)"
 export SQL_EDITOR=nvim  # lazysql: $EDITOR has args it cannot split

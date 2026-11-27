@@ -1,0 +1,3 @@
+-- Long-running helpers are systemd user services (see arch/bootstrap.sh).
+-- Add session-only commands here:
+-- hl.on("hyprland.start", function() hl.exec_cmd("uwsm-app -- my-helper") end)

@@ -1,0 +1,42 @@
+# Official repos. Installed with: pacman -S --needed
+base-devel
+git
+stow
+just
+
+# Session
+greetd
+greetd-tuigreet
+hyprland
+uwsm
+xdg-desktop-portal-hyprland
+xdg-desktop-portal-gtk
+hyprpolkitagent
+hypridle
+swaylock
+pipewire
+pipewire-pulse
+wireplumber
+networkmanager
+bluez
+bluez-utils
+
+# Desktop apps
+ghostty
+nautilus
+wl-clipboard
+jq
+ttf-jetbrains-mono-nerd
+noto-fonts
+noto-fonts-emoji
+
+# Shell and terminal tools
+zsh
+tmux
+neovim
+fzf
+zoxide
+starship
+eza
+bat
+lazygit
