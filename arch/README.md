@@ -30,9 +30,9 @@ Reboot. After the LUKS passphrase, greetd logs you straight into Hyprland (via u
 
 ## 3. VM test loop
 
-The VM needs a virtio GPU with 3D/GL acceleration, or Hyprland won't start.
+The VM needs a virtio GPU with 3D/GL acceleration, or Hyprland won't start. `just vm …` (`arch/vm/vm.sh`, needs `qemu-desktop edk2-ovmf`) provides this. Images live in `~/vms` (on btrfs: `chattr +C ~/vms` before creating them). On a Hyprland host, press `Ctrl+Alt+G` in the VM window before using `SUPER` bindings, or the host takes them.
 
-1. Install base Arch (step 1), then snapshot it as **clean-base**.
+1. Install base Arch (step 1) with `just vm iso` then `just vm create`, then snapshot it as **clean-base** with `just vm seal`. Restore it with `just vm reset`; boot with `just vm run`.
 2. Run step 2 from the branch.
 3. Run the checks below. Fix problems **in the repo** (push, then pull in the guest), not by hand in the guest.
 4. Reboot, rerun `arch/bootstrap.sh`: no errors, nothing duplicated, no config overwritten.
