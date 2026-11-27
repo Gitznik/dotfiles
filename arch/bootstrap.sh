@@ -237,7 +237,14 @@ if ! diff -rq "$theme_src" "$theme_dst" >/dev/null 2>&1; then
   theme_changed=1
 fi
 if [[ $(plymouth-set-default-theme) != gitznik || ${theme_changed:-0} == 1 ]]; then
-  sudo plymouth-set-default-theme -R gitznik   # -R rebuilds the initramfs
+  if command -v limine-mkinitcpio >/dev/null; then
+    # Limine (limine-entry-tool): rebuild the initramfs and the boot entries in one go; plain
+    # mkinitcpio would stop and ask, since it doesn't update the entries.
+    sudo plymouth-set-default-theme gitznik
+    sudo limine-mkinitcpio
+  else
+    sudo plymouth-set-default-theme -R gitznik   # -R rebuilds the initramfs
+  fi
 fi
 # grep exits 2 when mkinitcpio.conf.d/ has no *.conf; keep that from failing the check under pipefail.
 hooks=$(grep -hsE '^\s*HOOKS(\+)?=' /etc/mkinitcpio.conf /etc/mkinitcpio.conf.d/*.conf || true)
