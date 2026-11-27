@@ -78,7 +78,8 @@ case ${1:-} in
     ;;
   ssh)
     shift
-    exec ssh -i "$key" -o IdentitiesOnly=yes "${ssh_opts[@]}" "${VM_USER:-$USER}@localhost" "$@"
+    tty=(); [[ -t 0 ]] && tty=(-t)
+    exec ssh "${tty[@]}" -i "$key" -o IdentitiesOnly=yes "${ssh_opts[@]}" "${VM_USER:-$USER}@localhost" "$@"
     ;;
   run)
     [[ -f $dir/work.qcow2 ]] || die "no overlay; run: vm.sh seal (or reset)"
