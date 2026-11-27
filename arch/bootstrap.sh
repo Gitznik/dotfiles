@@ -166,9 +166,11 @@ if [[ $(findmnt -no FSTYPE /) == btrfs ]]; then
         "ENABLE_LIMINE_FALLBACK=yes" "FIND_BOOTLOADERS=yes" "MAX_SNAPSHOT_ENTRIES=5" |
         sudo install -Dm644 /dev/stdin /etc/default/limine
     fi
-    yay -S --needed --noconfirm --answerdiff None --answerclean None limine-mkinitcpio-hook limine-snapper-sync
+    # inotify-tools: limine-snapper-sync watches the snapshot list (else it falls back to a snapper plugin).
+    yay -S --needed --noconfirm --answerdiff None --answerclean None inotify-tools limine-mkinitcpio-hook limine-snapper-sync
     sudo limine-update
     sudo systemctl enable --now limine-snapper-sync.service
+    sudo limine-snapper-sync   # add the snapshots that existed before the tool to the boot menu now
   else
     echo "bootstrap: snapshots are taken, but booting into one needs Limine (see README step 1)" >&2
   fi
