@@ -1,0 +1,11 @@
+[Plymouth Theme]
+Name=Gitznik
+Description=Catppuccin Mocha boot splash and LUKS prompt.
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/gitznik
+ScriptFile=/usr/share/plymouth/themes/gitznik/gitznik.script
+ConsoleLogBackgroundColor=0x1e1e2e
+MonospaceFont=JetBrainsMono Nerd Font 11
+Font=JetBrainsMono Nerd Font 11

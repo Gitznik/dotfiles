@@ -8,19 +8,22 @@ Decide these per machine. Don't script them:
 
 - [ ] Target disk confirmed (`lsblk`). Don't use the daily driver's disk.
 - [ ] LUKS full-disk encryption (required: auto-login relies on the disk passphrase), bootloader, kernel (`linux` + `linux-headers`), microcode (`amd-ucode`/`intel-ucode`)
+- [ ] Boot splash for the LUKS prompt: `plymouth` package installed, `plymouth` in mkinitcpio `HOOKS` after `base udev`/`systemd` and before `encrypt`/`sd-encrypt`, `quiet splash` on the kernel command line (bootloader-specific; with a UKI it's `/etc/kernel/cmdline`), then `mkinitcpio -P`. The bootstrap installs the theme and warns if the hook or `splash` is missing. A serial console on the command line (`console=ttyS0`/`uart`) makes Plymouth fall back to text
 - [ ] User in `wheel` with sudo
 - [ ] Packages: `base base-devel git networkmanager`, with `NetworkManager` enabled so the first boot has network
 - [ ] Boots to a TTY login
 
-Keep Wi-Fi passwords, SSH/GPG keys and tokens out of this repo.
+Keep Wi-Fi passwords, SSH/GPG keys and tokens out of this repo. SSH keys live in Bitwarden: pull them from there on each machine (step 2), never copy them between machines or commit them.
 
 ## 2. Workstation bootstrap
 
 ```sh
-git clone git@github.com:Gitznik/dotfiles.git ~/dotfiles   # or https:// before SSH keys exist
+git clone https://github.com/Gitznik/dotfiles.git ~/dotfiles   # SSH keys aren't on the machine yet
 cd ~/dotfiles && git switch arch
 arch/bootstrap.sh
 ```
+
+**Real machines only (not the VM):** pull the SSH keys from Bitwarden into `~/.ssh` (`chmod 700 ~/.ssh`, `600` on private keys), then switch the remote: `git -C ~/dotfiles remote set-url origin git@github.com:Gitznik/dotfiles.git`. Use the Bitwarden desktop app or `bitwarden-cli` (official repo). **Open:** exact item names and storage type (SSH-key items or attachments), and whether to script this step.
 
 The bootstrap installs `packages-repo.txt` and `packages-aur.txt`, checks for conflicts with existing files, stows the shared and desktop packages, installs the greetd config, enables services and sets zsh as the login shell. If any file would be overwritten, it stops before changing anything. Rerunning it is safe.
 
@@ -41,6 +44,7 @@ The VM needs a virtio GPU with 3D/GL acceleration, or Hyprland won't start. `jus
 
 ### Milestone 1 checks
 
+- [ ] LUKS prompt shows the Gitznik Plymouth theme (Catppuccin Mocha, lock icon, password box); a wrong passphrase re-prompts
 - [ ] Boot: LUKS passphrase, then straight into Hyprland (no second password). Catppuccin borders, no Hyprland logo or splash
 - [ ] Log out: tuigreet appears, and logging back in works
 - [ ] `SUPER+RETURN` opens Ghostty (Catppuccin Mocha) with zsh, prompt and plugins and no startup errors; `tmux` starts
@@ -60,3 +64,9 @@ The VM needs a virtio GPU with 3D/GL acceleration, or Hyprland won't start. `jus
 2. Screenshot on `PRINT`; clipboard history via `elephant-clipboard`
 3. Notifications with DND + screen-share DND script; crash notifications
 4. Hardware: dock/lid, suspend/resume, second display (workspaces stay global), portal screen sharing
+
+## Notes
+
+- **Plymouth theme** (`arch/plymouth/gitznik`): adapted from Omarchy 4.5.0's theme (MIT, `LICENSE` alongside). To change the logo text, re-render `logo.png`:
+  `magick -background none -fill '#cba6f7' +antialias -font JetBrainsMono-NF-Bold -pointsize 13 label:Gitznik -trim +repage -filter point -resize 1300% logo.png`
+  (pixel style; for smooth letters, drop `+antialias … -resize 1300%` and use `-pointsize 170`). Then rerun the bootstrap.

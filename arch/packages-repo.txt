@@ -4,6 +4,9 @@ git
 stow
 just
 
+# Boot
+plymouth
+
 # Session
 greetd
 greetd-tuigreet

@@ -52,6 +52,21 @@ step "Services"
 sudo systemctl enable --now "${system_services[@]}"
 systemctl --user enable "${user_services[@]}"
 
+step "Boot splash (Plymouth theme)"
+theme_src="$repo/arch/plymouth/gitznik" theme_dst=/usr/share/plymouth/themes/gitznik
+if ! diff -rq "$theme_src" "$theme_dst" >/dev/null 2>&1; then
+  sudo rm -rf "$theme_dst"
+  sudo cp -r "$theme_src" "$theme_dst"
+  theme_changed=1
+fi
+if [[ $(plymouth-set-default-theme) != gitznik || ${theme_changed:-0} == 1 ]]; then
+  sudo plymouth-set-default-theme -R gitznik   # -R rebuilds the initramfs
+fi
+grep -hE '^\s*HOOKS(\+)?=' /etc/mkinitcpio.conf /etc/mkinitcpio.conf.d/*.conf 2>/dev/null | grep -qw plymouth ||
+  echo "bootstrap: WARNING: no plymouth hook in mkinitcpio HOOKS, so the theme won't show (see README step 1)" >&2
+grep -qw splash /proc/cmdline ||
+  echo "bootstrap: WARNING: 'splash' missing from kernel cmdline, so the theme won't show (see README step 1)" >&2
+
 step "Login: greetd auto-login"
 greetd_conf=$(sed "s/@USER@/$USER/" "$repo/arch/etc/greetd/config.toml")
 if ! diff -q <(echo "$greetd_conf") /etc/greetd/config.toml >/dev/null 2>&1; then
