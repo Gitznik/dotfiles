@@ -10,6 +10,10 @@ arch-bootstrap:
 update:
   arch/update.sh
 
+# Back up home now (restic; set up once with: backup init)
+backup:
+  ~/.local/bin/backup run
+
 # Arch test VM: iso | create | install | seal | reset | run | ssh-key | ssh (see arch/vm/vm.sh)
 [positional-arguments]
 vm *args:

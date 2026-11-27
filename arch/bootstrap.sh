@@ -6,7 +6,7 @@ set -euo pipefail
 
 repo=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 common=(zsh tmux nvim lazygit workmux mise)
-desktop=(hypr ghostty services swaylock screensaver waybar walker elephant tui screenshot notifications wallpaper theme)
+desktop=(hypr ghostty services swaylock screensaver waybar walker elephant tui screenshot notifications wallpaper theme backup)
 system_services=(NetworkManager.service bluetooth.service cups.socket avahi-daemon.service ufw.service power-profiles-daemon.service docker.socket plocate-updatedb.timer fstrim.timer systemd-oomd.service)
 user_services=(hyprpolkitagent.service hypridle.service elephant.service walker.service waybar.service dnd-on-screenshare.service crash-watch.service swaybg.service swayosd.service)
 
@@ -61,7 +61,7 @@ done
 yay -S --needed --noconfirm --answerdiff None --answerclean None --removemake "${apps[@]}"
 
 # Real dirs first, so stow links files inside them instead of folding whole dirs into the repo.
-mkdir -p "$HOME"/.config/{systemd/user,environment.d,walker,elephant/menus,gtk-3.0,gtk-4.0,qt6ct} "$HOME"/.local/{bin,share,state} "$HOME"/.zsh
+mkdir -p "$HOME"/.config/{systemd/user,environment.d,backup,walker,elephant/menus,gtk-3.0,gtk-4.0,qt6ct} "$HOME"/.local/{bin,share,state} "$HOME"/.zsh
 
 step "Checking for config conflicts"
 if ! stow -n -d "$repo" -t "$HOME" "${common[@]}" 2>/tmp/bootstrap-stow.$$ ||

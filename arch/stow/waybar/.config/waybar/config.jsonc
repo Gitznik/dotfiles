@@ -6,7 +6,7 @@
   "spacing": 0,
   "reload_style_on_change": true,
   "modules-left": ["hyprland/workspaces"],
-  "modules-center": ["custom/dotfiles", "custom/stay-awake", "custom/dnd", "clock"],
+  "modules-center": ["custom/backup", "custom/dotfiles", "custom/stay-awake", "custom/dnd", "clock"],
   "modules-right": ["tray", "bluetooth", "network", "wireplumber", "battery", "custom/system"],
 
   "hyprland/workspaces": {
@@ -59,6 +59,13 @@
     "format-full": "󰁹",
     "format-icons": ["󰁺", "󰁼", "󰁾", "󰂀", "󰂂"],
     "states": { "warning": 20, "critical": 10 }
+  },
+  "custom/backup": {
+    "exec": "$HOME/.local/bin/backup status --waybar",
+    "return-type": "json",
+    "interval": 3600,
+    "signal": 11,
+    "on-click": "uwsm-app -- ghostty --wait-after-command=true -e sh -c '[ -f ~/.config/backup/target.env ] && exec ~/.local/bin/backup run || exec ~/.local/bin/backup init'"
   },
   "custom/dotfiles": {
     "exec": "$HOME/.local/bin/dotfiles-status",

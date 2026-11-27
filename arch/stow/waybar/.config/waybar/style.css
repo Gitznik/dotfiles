@@ -46,6 +46,7 @@ tooltip {
 
 #clock,
 #tray,
+#custom-backup,
 #custom-dotfiles,
 #custom-stay-awake,
 #custom-dnd,
@@ -61,6 +62,8 @@ tooltip {
   margin-right: 4px;
 }
 
+#custom-backup.overdue,
+#custom-backup.unset,
 #custom-dotfiles.behind,
 #custom-stay-awake.on,
 #custom-dnd.on {
@@ -78,6 +81,7 @@ tooltip {
   color: @peach;
 }
 
+#custom-backup.failed,
 #battery.critical:not(.charging) {
   color: @red;
 }

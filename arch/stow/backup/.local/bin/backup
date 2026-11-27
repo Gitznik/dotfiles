@@ -1,0 +1,140 @@
+#!/usr/bin/env bash
+# Offsite backups of $HOME with restic (encrypted, deduplicated) over SFTP.
+#   backup init     one-time per machine: target, SSH key, repository password (keyring)
+#   backup run      back up now, then prune and (weekly) check. The daily timer runs this.
+#   backup status   last success/failure; --waybar for the bar icon
+#   backup restic … any restic command against this machine's repository (snapshots,
+#                   mount ~/mnt, restore latest --target ~/restore --include ~/Documents, …)
+# Target and settings live in ~/.config/backup/target.env (local, not in the dotfiles).
+set -euo pipefail
+conf_dir=$HOME/.config/backup
+target=$conf_dir/target.env
+state=$HOME/.local/state/backup
+key=$HOME/.ssh/backup_ed25519
+mkdir -p "$state"
+
+die() { echo "backup: $*" >&2; exit 1; }
+notify() { command -v notify-send >/dev/null && notify-send "$@" || true; }
+
+load() {
+  [[ -f $target ]] || die "not set up yet: run 'backup init'"
+  # shellcheck source=/dev/null
+  . "$target"
+  export RESTIC_REPOSITORY=$BACKUP_REPO
+  export RESTIC_PASSWORD_COMMAND="secret-tool lookup service restic-backup repository $BACKUP_REPO"
+  restic_opts=()
+  if [[ $BACKUP_REPO == sftp:* ]]; then
+    local spec=${BACKUP_REPO#sftp:}
+    ssh_dest=${spec%%:*}; ssh_host=${ssh_dest#*@}
+    restic_opts=(-o "sftp.command=ssh -i $key -p ${BACKUP_SSH_PORT:-22} -o IdentitiesOnly=yes -o BatchMode=yes -o ServerAliveInterval=30 $ssh_dest -s sftp")
+  fi
+}
+r() { restic "${restic_opts[@]}" "$@"; }
+reachable() {
+  [[ -n ${ssh_host:-} ]] || return 0   # local repositories are always reachable
+  timeout 5 bash -c "</dev/tcp/$ssh_host/${BACKUP_SSH_PORT:-22}" 2>/dev/null
+}
+
+cmd_init() {
+  mkdir -p "$conf_dir" ~/.ssh && chmod 700 ~/.ssh
+  if [[ -f $target ]]; then
+    . "$target"; echo "Target: $BACKUP_REPO (edit $target to change)"
+  else
+    local host user path port
+    read -rp "NAS/Storage Box host (e.g. nas.lan or 192.168.x.y): " host
+    read -rp "SFTP port [22]: " port
+    read -rp "SFTP user [restic]: " user
+    read -rp "Path on the server [/backup/restic/$(hostname)]: " path
+    port=${port:-22} user=${user:-restic} path=${path:-/backup/restic/$(hostname)}
+    printf 'BACKUP_REPO="sftp:%s@%s:%s"\nBACKUP_SSH_PORT=%s\n' "$user" "$host" "$path" "$port" >"$target"
+    . "$target"
+  fi
+  if [[ ! -f $key ]]; then
+    ssh-keygen -q -t ed25519 -N '' -C "backup@$(hostname)" -f "$key"
+  fi
+  echo; echo "Backup SSH key (add it to the backup user on the server, see arch/README.md 'Backups'):"
+  cat "$key.pub"; echo
+  read -rp "Press Enter once the key is installed on the server..."
+  load
+  reachable || die "$ssh_host:${BACKUP_SSH_PORT:-22} isn't reachable"
+  if ! secret-tool lookup service restic-backup repository "$BACKUP_REPO" >/dev/null 2>&1; then
+    local pw
+    read -rsp "Repository password (empty = generate a new one; use the Bitwarden copy for an existing repository): " pw; echo
+    if [[ -z $pw ]]; then
+      pw=$(head -c 32 /dev/urandom | base64 | tr -d '/+=' | head -c 40)
+      echo "New repository password, store it in Bitwarden NOW (needed to restore on another machine):"
+      echo "  $pw"
+      read -rp "Press Enter once it's in Bitwarden..."
+    fi
+    printf '%s' "$pw" | secret-tool store --label="restic backup ($BACKUP_REPO)" service restic-backup repository "$BACKUP_REPO"
+  fi
+  if r cat config >/dev/null 2>&1; then
+    echo "Repository exists and the password works."
+  else
+    r init
+  fi
+  systemctl --user enable --now backup.timer
+  echo "Done. Daily backups are on; run one now with 'backup run' (the first one takes a while)."
+}
+
+cmd_run() {
+  load
+  if ! reachable; then
+    echo "backup: $ssh_host not reachable (away from home?), skipping"; exit 0
+  fi
+  echo "started $(date -Is)" >"$state/running"
+  trap 'rm -f "$state/running"' EXIT
+  if ! out=$(
+    r backup "$HOME" --exclude-file "$conf_dir/excludes" --exclude-caches \
+      --exclude-if-present .nobackup --one-file-system --tag "${BACKUP_TAG:-auto}" 2>&1 &&
+    r forget --prune --keep-daily 7 --keep-weekly 4 --keep-monthly 12 2>&1
+  ); then
+    printf '%s\n' "$out" | tail -20
+    date -Is >"$state/last-failure"
+    notify -u critical "Backup failed" "journalctl --user -u backup -e, or run: backup run"
+    exit 1
+  fi
+  printf '%s\n' "$out" | grep -E '^(Added|processed|snapshot|Files:|Dirs:)' || true
+  date -Is >"$state/last-success"; rm -f "$state/last-failure"
+  # Weekly integrity check of the repository structure and 5% of the data.
+  if [[ ! -f $state/last-check ]] || (( $(date +%s) - $(date -r "$state/last-check" +%s) > 7*86400 )); then
+    if r check --read-data-subset=5% >/dev/null 2>&1; then
+      date -Is >"$state/last-check"
+    else
+      notify -u critical "Backup check failed" "Run: backup restic check"
+    fi
+  fi
+  pkill -RTMIN+11 -x waybar || true
+}
+
+age_days() { echo $(( ($(date +%s) - $(date -r "$1" +%s)) / 86400 )); }
+
+cmd_status() {
+  local icon=$'\U000F0160' text="" tooltip="" class=""   # nf-md-backup_restore
+  if [[ ! -f $target ]]; then
+    text=$icon class=unset tooltip="Backups not set up: run backup init"
+  elif [[ -f $state/last-failure ]]; then
+    text=$icon class=failed tooltip="Last backup failed $(cat "$state/last-failure"). Click to retry."
+  elif [[ ! -f $state/last-success ]]; then
+    text=$icon class=overdue tooltip="No backup yet. Click to run one."
+  elif (( $(age_days "$state/last-success") >= 3 )); then
+    text=$icon class=overdue tooltip="Last backup $(age_days "$state/last-success") days ago. Click to run one."
+  fi
+  if [[ ${1:-} == --waybar ]]; then
+    printf '{"text": "%s", "class": "%s", "tooltip": "%s"}\n' "$text" "$class" "$tooltip"
+  else
+    [[ -f $target ]] && { . "$target"; echo "target:       $BACKUP_REPO"; }
+    echo "last success: $(cat "$state/last-success" 2>/dev/null || echo never)"
+    echo "last failure: $(cat "$state/last-failure" 2>/dev/null || echo none)"
+    echo "last check:   $(cat "$state/last-check" 2>/dev/null || echo never)"
+    systemctl --user list-timers backup.timer --no-pager 2>/dev/null | sed -n 2p
+  fi
+}
+
+case ${1:-} in
+  init) cmd_init ;;
+  run) cmd_run ;;
+  status) shift; cmd_status "$@" ;;
+  restic) shift; load; r "$@" ;;
+  *) sed -n '2,9p' "$0" | sed 's/^# \{0,1\}//'; exit 2 ;;
+esac

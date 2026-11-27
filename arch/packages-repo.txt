@@ -96,6 +96,7 @@ starship
 eza
 bat
 lazygit
+restic
 btop
 ripgrep
 fd

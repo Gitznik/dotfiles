@@ -1,0 +1,26 @@
+# restic excludes for `backup run` (backs up $HOME). Also skipped: dirs with a .nobackup file
+# and CACHEDIR.TAG-marked caches. Patterns: restic --exclude-file syntax.
+$HOME/.cache
+$HOME/.local/share/Trash
+$HOME/.local/share/Steam
+$HOME/.local/share/mise
+$HOME/.local/share/containers
+$HOME/.local/share/opencode-recovery
+$HOME/.steam
+$HOME/Games
+$HOME/Downloads
+$HOME/vms
+$HOME/go/pkg
+$HOME/.npm
+$HOME/.nuget
+$HOME/.cargo/registry
+$HOME/.rustup
+$HOME/.zen/*/cache2
+$HOME/.config/chromium/*/Cache
+$HOME/.config/chromium/*/Code Cache
+node_modules
+.venv
+__pycache__
+target/debug
+target/release
+.terraform
