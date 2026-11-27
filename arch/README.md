@@ -119,7 +119,7 @@ The VM needs a virtio GPU with 3D/GL acceleration, or Hyprland won't start. `jus
 ### System, hardware and update checks
 
 - [ ] `snapper -c root list` shows pre/post pairs after a `yay` install; with Limine, the boot menu lists snapshots (hardware)
-- [ ] `zramctl` shows zram swap; `sysctl fs.inotify.max_user_watches` is 524288; `ulimit -n` in a service is 65536
+- [ ] `zramctl` shows zram swap; `sysctl fs.inotify.max_user_watches` is 524288; `ulimit -n` in a terminal is 65536 (user session and system services)
 - [ ] 3 wrong passwords on the lock screen don't lock the account for 10 minutes (`faillock` allows 10, unlocks after 2 min)
 - [ ] `avahi-browse -at` lists network services; a network printer shows up in `system-config-printer` (hardware)
 - [ ] `docker run --rm alpine nslookup archlinux.org` resolves with ufw active

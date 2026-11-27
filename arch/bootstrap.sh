@@ -92,7 +92,7 @@ gsettings set org.gnome.desktop.interface cursor-size 24
   sed "s|@HOME@|$HOME|" "$repo/arch/etc/qt6ct/qt6ct.conf" >"$HOME/.config/qt6ct/qt6ct.conf"
 
 step "System tuning"
-for f in sysctl.d/90-workstation.conf systemd/system.conf.d/90-workstation.conf \
+for f in sysctl.d/90-workstation.conf systemd/system.conf.d/90-workstation.conf systemd/user.conf.d/90-workstation.conf \
   systemd/system/user@.service.d/90-faster-shutdown.conf systemd/logind.conf.d/90-workstation.conf \
   udev/rules.d/50-framework16-qmk-hid.rules; do
   install_managed "$repo/arch/etc/$f" "/etc/$f"
@@ -137,8 +137,9 @@ if [[ $(findmnt -no FSTYPE /) == btrfs ]]; then
   sudo pacman -S --needed --noconfirm snapper
   [[ -f /etc/snapper/configs/root ]] || sudo snapper -c root create-config /
   # Snapshots per pacman transaction only (snap-pac), keep the last 5; no hourly timeline.
+  # ALLOW_USERS/SYNC_ACL: list snapshots without sudo.
   sudo snapper -c root set-config TIMELINE_CREATE=no NUMBER_CLEANUP=yes NUMBER_MIN_AGE=0 \
-    NUMBER_LIMIT=5 NUMBER_LIMIT_IMPORTANT=5
+    NUMBER_LIMIT=5 NUMBER_LIMIT_IMPORTANT=5 ALLOW_USERS="$USER" SYNC_ACL=yes
   sudo pacman -S --needed --noconfirm snap-pac
   sudo systemctl enable --now snapper-cleanup.timer
   if pacman -Q limine >/dev/null 2>&1; then
